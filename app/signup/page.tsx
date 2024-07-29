@@ -2,6 +2,7 @@
 import React, { useState,useEffect } from 'react';
 import { signup } from '../../lib/signup';
 import { useRouter } from 'next/navigation'; 
+import GoogleLoginComponent from '../../components/google_login';
 
 const generateUsername = (firstName: string, lastName:string) => {
     const randomNumber = Math.floor(100 + Math.random() * 900); // Generate a random 3-digit number
@@ -169,8 +170,15 @@ const togglePasswordVisibility = () => {
             <a href="#" className="underline">privacy policy</a>
           </p>
         </form>
+        <div className="App">
+        <header className="App-header">
+        <h1>Google Login with React</h1>
+        <GoogleLoginComponent />
+        </header>
+        </div>
       </main>
     </div>
+
     </div>
   );
 };
