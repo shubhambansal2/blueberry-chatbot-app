@@ -3,7 +3,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/navigation';
 
 const GoogleLoginComponent = () => {
-    const handleLoginSuccess = (credentialResponse:any) => {
+    const HandleLoginSuccess = (credentialResponse:any) => {
         const router = useRouter();
         console.log("Google login success. Credential response:", credentialResponse);
         
@@ -42,7 +42,7 @@ const GoogleLoginComponent = () => {
   return (
     <GoogleOAuthProvider clientId="449925857021-obreiledjt3ajutc62bdfsqebrdi0r0q.apps.googleusercontent.com">
       <GoogleLogin
-        onSuccess={handleLoginSuccess}
+        onSuccess={HandleLoginSuccess}
         onError={() => {
           console.log('Login Failed');
         }}
