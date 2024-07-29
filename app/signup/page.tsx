@@ -10,9 +10,6 @@ const generateUsername = (firstName: string, lastName:string) => {
   };
 
 
-
-
-  
 const SignUpPage: React.FC = () => {
     // const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -32,9 +29,8 @@ const togglePasswordVisibility = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  
   const router = useRouter(); // Initialize useRouter
-
 
   useEffect(() => {
     if (formData.firstName && formData.lastName) {
@@ -57,8 +53,7 @@ const togglePasswordVisibility = () => {
 
     try {
         const response = await signup(updatedFormData); // Assume `signup` is defined elsewhere
-  
-        if (response.token) {
+        if (response.tokens) {
           console.log('Signup successful:', response.user_id);
           // Redirect to login page on successful signup
           router.push('/login?fromsignup=1');

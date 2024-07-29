@@ -4,11 +4,16 @@ interface SignupData {
     password: string;
   }
   
-  interface SignupResponse {
-    token: string;
+  interface Tokens {
+    refresh: string;
+    access: string;
+}
+
+interface SignupResponse {
+    tokens: Tokens;
     user_id: number;
     email: string;
-  }
+}
   
   async function signup(data: SignupData): Promise<SignupResponse> {
     const apiUrl = 'http://127.0.0.1:8000/api/users/signup/'; // Replace with your actual API endpoint
