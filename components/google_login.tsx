@@ -3,41 +3,33 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/navigation';
 
 const GoogleLoginComponent = () => {
-    const HandleLoginSuccess = (credentialResponse:any) => {
-        // const router = useRouter();
-        console.log("Google login success. Credential response:", credentialResponse);
-        
-//         if (credentialResponse && credentialResponse.credential) {
-//           console.log("Received credential:", credentialResponse.credential);
-//           // Your fetch call would go here
-//           fetch('http://127.0.0.1:8000/api/users/google-login/', {
-//             method: 'POST',  // Typically, login is done via POST
-//             headers: {
-//                 'Authorization': `Bearer ${credentialResponse.credential}`,
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ token: credentialResponse.credential })  // Include token in body if needed
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             console.log(data);
-
-//             if (data.tokens && data.tokens.access) {
-//                 // Set the access token in local storage
-//                 localStorage.setItem('access_token', data.tokens.access);
-
-//                 // Redirect to home page
-//                 router.push('/');  // Adjust the path as needed
-//             }
-//         })
-//         .catch(error => console.error('Error:', error));
-
-        
-// //     localStorage.setItem('accessToken', tokens.access);
-//         } else {
-//           console.error("Credential response is missing or invalid");
-//         }
-      };
+    const router = useRouter();
+  
+    const HandleLoginSuccess = async (credentialResponse:any) => {
+      console.log("Google login success. Credential response:", credentialResponse.credential);
+      
+      const { credential } = credentialResponse.credential;
+      
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/users/google-login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: credential }),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to authenticate');
+        }
+  
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        router.push('/');
+      } catch (error) {
+        console.error('Login failed:', error);
+      }
+    };
 
   return (
     <GoogleOAuthProvider clientId="449925857021-obreiledjt3ajutc62bdfsqebrdi0r0q.apps.googleusercontent.com">
