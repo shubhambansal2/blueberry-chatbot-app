@@ -16,7 +16,7 @@ interface SignupResponse {
 }
   
   async function signup(data: SignupData): Promise<SignupResponse> {
-    const apiUrl = 'http://127.0.0.1:8000/api/users/signup/'; // Replace with your actual API endpoint
+    const apiUrl = 'https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/signup/';
   
     try {
       const response = await fetch(apiUrl, {
