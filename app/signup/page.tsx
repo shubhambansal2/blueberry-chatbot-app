@@ -29,7 +29,7 @@ const togglePasswordVisibility = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const router = useRouter(); // Initialize useRouter
 
   useEffect(() => {
@@ -159,18 +159,18 @@ const togglePasswordVisibility = () => {
                 )}
             </button>
         </div>
-          <button type="submit" className="w-full p-2 bg-black text-white rounded">Sign up</button>
+          <div className="flex flex-row gap-x-4">
+          <button type="submit" className="w-50 p-2 bg-black text-white rounded">Sign up</button>
+          <p className="text-md text-gray-600 text-center justif-center items-center mt-2">
+            OR
+            </p>
+          <GoogleLoginComponent/>
+          </div>
           <p className="text-sm text-gray-600 text-center">
             By continuing, you agree to our <a href="#" className="underline">terms of service</a> and{' '}
             <a href="#" className="underline">privacy policy</a>
           </p>
         </form>
-        <div className="App">
-        <header className="App-header">
-        <h1>Google Login with React</h1>
-        <GoogleLoginComponent />
-        </header>
-        </div>
       </main>
     </div>
 

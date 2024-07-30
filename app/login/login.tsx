@@ -3,6 +3,8 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { login } from '../../lib/login';
+import GoogleLoginComponent from '../../components/google_login';
+
 
 
 export default function Login() {
@@ -94,13 +96,13 @@ export default function Login() {
               {error}
             </div>
           )}
-        <div className="flex items-center justify-between">
-          <button
-            className="w-full bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="submit"
-          >
-            Login
-          </button>
+        <div className="flex flex-col items-center justify-between">
+          
+          <button className="w-full bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
+          <div className="text-black">
+          <p> OR </p>
+          </div>
+          <GoogleLoginComponent/>
         </div>
         <p className="text-center text-black  mt-6">
           No account yet? <a className="font-bold text-blue-500 hover:text-blue-800" href="/signup">Sign up</a>
