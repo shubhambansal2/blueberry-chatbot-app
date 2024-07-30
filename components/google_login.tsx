@@ -8,16 +8,24 @@ const GoogleLoginComponent = () => {
     const HandleLoginSuccess = async (credentialResponse:any) => {
       console.log("Google login success. Credential response:", credentialResponse.credential);
       
-      const { credential } = credentialResponse.credential;
+      const { received_token } = credentialResponse.credential;
+
+      console.log(received_token)
       
+      if (!received_token) {
+        console.error('No credential found in the response');
+        return;
+      }
       try {
         const response = await fetch('http://127.0.0.1:8000/api/users/google-login/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ token: credential }),
+          body: JSON.stringify({ token: received_token }),
         });
+
+        
   
         if (!response.ok) {
           throw new Error('Failed to authenticate');
