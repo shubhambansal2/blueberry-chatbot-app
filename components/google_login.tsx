@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 const GoogleLoginComponent = () => {
     const HandleLoginSuccess = (credentialResponse:any) => {
-        const router = useRouter();
+        // const router = useRouter();
         console.log("Google login success. Credential response:", credentialResponse);
         
 //         if (credentialResponse && credentialResponse.credential) {
