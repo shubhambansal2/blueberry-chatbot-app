@@ -8,10 +8,10 @@ const GoogleLoginComponent = () => {
     const HandleLoginSuccess = async (credentialResponse:any) => {
       console.log("Google login success. Credential response:", credentialResponse.credential);
       
-      const {received_token}  = credentialResponse;
+      const received_token  = credentialResponse.credential;
 
       console.log(received_token)
-      
+
       if (!received_token) {
         console.error('No credential found in the response');
         return;
@@ -24,20 +24,20 @@ const GoogleLoginComponent = () => {
           },
           body: JSON.stringify({ token: received_token }),
         });
-
-        
-  
         if (!response.ok) {
           throw new Error('Failed to authenticate');
         }
-  
+
         const data = await response.json();
-        localStorage.setItem('token', data.token);
+        console.log("Backend response data:", data);
+        
+        const accessToken = data.tokens.access;
+        localStorage.setItem('accessToken', accessToken);
         router.push('/');
       } catch (error) {
         console.error('Login failed:', error);
       }
-    };
+      };
 
   return (
     <GoogleOAuthProvider clientId="449925857021-obreiledjt3ajutc62bdfsqebrdi0r0q.apps.googleusercontent.com">
