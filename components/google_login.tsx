@@ -8,7 +8,7 @@ const GoogleLoginComponent = () => {
     const HandleLoginSuccess = async (credentialResponse:any) => {
       console.log("Google login success. Credential response:", credentialResponse.credential);
       
-      const { received_token } = credentialResponse.credential;
+      const {received_token}  = credentialResponse;
 
       console.log(received_token)
       
