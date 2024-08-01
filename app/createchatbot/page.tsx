@@ -1,0 +1,146 @@
+'use client'
+import React, { useState } from 'react';
+import { FiMenu, FiX } from 'react-icons/fi';
+import Link from 'next/link';
+
+const CreateChatbotPage = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [personality, setPersonality] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [role, setRole] = useState('');
+
+  // Dummy list of saved chatbots
+  const savedChatbots = [
+    { id: 1, name: 'Customer Service Bot', company: 'TechCorp' },
+    { id: 2, name: 'Sales Assistant', company: 'RetailGiant' },
+    { id: 3, name: 'IT Support Bot', company: 'ITSolutions' },
+  ];
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    // Handle form submission logic here
+  };
+
+  const handleCancel = () => {
+    // Handle cancel logic here
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar Toggle Button */}
+      <button
+        className="fixed top-4 left-4 z-20 p-2 rounded-md bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+      </button>
+
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-64 bg-gray-100 text-gray-800 p-6 transition duration-200 ease-in-out z-10 flex flex-col justify-between shadow-lg`}>
+      <div>
+          <h2 className="text-2xl font-semibold mb-6">Menu</h2>
+          <ul className="space-y-4">
+            <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">
+            <Link href="/createchatbot">Create Chatbots</Link></li>
+            <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">
+            <Link href="/testchatbot">Test Chatbots</Link></li>
+            <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">Integrations</li>
+            <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">Resources</li>
+          </ul>
+        </div>
+        <div className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">
+          Profile
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8 ml-0 md:ml-64 overflow-auto">
+        <div className="max-w-4xl">
+          <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Chatbot</h1>
+          <form 
+            className="bg-white p-6 rounded-lg shadow-md"
+            onSubmit={handleSubmit}
+          >
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Personality</label>
+              <input
+                type="text"
+                value={personality}
+                onChange={(e) => setPersonality(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Company Name</label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                required
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-gray-700 mb-2">Role</label>
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                required
+              />
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-150"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-150"
+              >
+                Create Chatbot
+              </button>
+            </div>
+          </form>
+        </div>
+        <div className="mb-8">
+  < h2 className="text-2xl font-semibold text-gray-800 mb-4 mt-4">Your Chatbots</h2>
+    <div className="flex flex-wrap -mx-4">
+        {savedChatbots.map((bot) => (
+        <div key={bot.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">{bot.name}</h3>
+                <p className="text-gray-600">Company: {bot.company}</p>
+            </div>
+            </div>
+        </div>
+            ))}
+      </div>
+      </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateChatbotPage;
