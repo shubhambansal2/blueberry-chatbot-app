@@ -1,7 +1,9 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 import Link from 'next/link';
+import axios from 'axios';
+
 
 const CreateChatbotPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -9,13 +11,42 @@ const CreateChatbotPage = () => {
   const [personality, setPersonality] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [role, setRole] = useState('');
-
-  // Dummy list of saved chatbots
-  const savedChatbots = [
-    { id: 1, name: 'Customer Service Bot', company: 'TechCorp' },
-    { id: 2, name: 'Sales Assistant', company: 'RetailGiant' },
-    { id: 3, name: 'IT Support Bot', company: 'ITSolutions' },
-  ];
+  interface Chatbot {
+    chatbot_id: number;
+    chatbot_name: string;
+    company_name: string;
+    role: string;
+    personality: string;
+  }
+  
+  const [savedChatbots, setSavedChatbots] = useState<Chatbot[]>([]);
+  // Fetch chatbots from the backend when the component mounts
+  useEffect(() => {
+    const fetchChatbots = async () => {
+      try {
+        const token = localStorage.getItem('accessToken'); // Assuming the token is stored in localStorage
+        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        if (!response.ok) {
+          throw new Error('Failed to fetch chatbots');
+        }
+    
+        const chatbots = await response.json();
+        console.log(chatbots); // Handle the chatbots data
+        setSavedChatbots(chatbots);
+      } catch (error) {
+        console.error('Error fetching chatbots:', error);
+      }
+    };
+    
+    fetchChatbots();
+  }, []);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -125,21 +156,23 @@ const CreateChatbotPage = () => {
         </div>
         <div className="mb-8">
   < h2 className="text-2xl font-semibold text-gray-800 mb-4 mt-4">Your Chatbots</h2>
-    <div className="flex flex-wrap -mx-4">
-        {savedChatbots.map((bot) => (
-        <div key={bot.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{bot.name}</h3>
-                <p className="text-gray-600">Company: {bot.company}</p>
-            </div>
-            </div>
+  <div className="flex flex-wrap -mx-4">
+  {savedChatbots.map((bot) => (
+    <div key={bot.chatbot_id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{bot.chatbot_name}</h3>
+          <p className="text-gray-600">Company: {bot.company_name}</p>
+          <p className="text-gray-600">Role: {bot.role}</p>
+          <p className="text-gray-600">Personality: {bot.personality}</p>
         </div>
-            ))}
-      </div>
-      </div>
       </div>
     </div>
+      ))}
+      </div>
+      </div>
+      </div>
+      </div>
   );
 };
 
