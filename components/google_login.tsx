@@ -32,7 +32,11 @@ const GoogleLoginComponent = () => {
         console.log("Backend response data:", data);
         
         const accessToken = data.tokens.access;
+        const refreshToken = data.tokens.refresh;
+        const user = data.user_id;
         localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', user);
         router.push('/');
       } catch (error) {
         console.error('Login failed:', error);
