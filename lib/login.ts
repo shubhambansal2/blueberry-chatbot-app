@@ -6,8 +6,10 @@ export const login = async (email: string, password: string) => {
       email,
       password,
     });
-    const { tokens } = response.data;
+    const { tokens, user_id } = response.data;
     localStorage.setItem('accessToken', tokens.access);
+    localStorage.setItem('refreshToken', tokens.refresh);
+    localStorage.setItem('user', user_id);
     return true;
   } catch (error) {
     console.error('Login error:', error);

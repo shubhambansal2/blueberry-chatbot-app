@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 import Link from 'next/link';
 import axios from 'axios';
+import { fetchChatbots, Chatbot } from '../../lib/chatbotsfetch';
+
 
 
 const CreateChatbotPage = () => {
@@ -11,46 +13,53 @@ const CreateChatbotPage = () => {
   const [personality, setPersonality] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [role, setRole] = useState('');
-  interface Chatbot {
-    chatbot_id: number;
-    chatbot_name: string;
-    company_name: string;
-    role: string;
-    personality: string;
-  }
-  
   const [savedChatbots, setSavedChatbots] = useState<Chatbot[]>([]);
-  // Fetch chatbots from the backend when the component mounts
-  useEffect(() => {
-    const fetchChatbots = async () => {
+
+  
+  const getChatbots = async () => {
       try {
-        const token = localStorage.getItem('accessToken'); // Assuming the token is stored in localStorage
-        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-    
-        if (!response.ok) {
-          throw new Error('Failed to fetch chatbots');
-        }
-    
-        const chatbots = await response.json();
-        console.log(chatbots); // Handle the chatbots data
+        const chatbots = await fetchChatbots();
         setSavedChatbots(chatbots);
       } catch (error) {
         console.error('Error fetching chatbots:', error);
       }
     };
-    
-    fetchChatbots();
+  
+  useEffect(() => {
+    getChatbots();
   }, []);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // Handle form submission logic here
+    // log that form is submitted
+    console.log("Formsubmitted");
+    console.log(name, personality, companyName, role);
+    // get user from local storage
+    const user = localStorage.getItem('user');
+    const is_rag_enabled = false;
+    const rag_source = "FAQ Database 1 and 2";
+    const token = localStorage.getItem('accessToken');
+    axios.post('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/', {
+      chatbot_name: name,
+      personality: personality,
+      company_name: companyName,
+      role: role,
+      is_rag_enabled: is_rag_enabled,
+      rag_source: rag_source,
+      user: user
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log('Chatbot created successfully:', response.data);
+      getChatbots();
+    })
+    .catch(error => {
+      console.error('Error creating chatbot:', error);
+    });
   };
 
   const handleCancel = () => {
@@ -99,7 +108,7 @@ const CreateChatbotPage = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
                 required
               />
             </div>
@@ -110,7 +119,7 @@ const CreateChatbotPage = () => {
                 type="text"
                 value={personality}
                 onChange={(e) => setPersonality(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
                 required
               />
             </div>
@@ -121,7 +130,7 @@ const CreateChatbotPage = () => {
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
                 required
               />
             </div>
@@ -132,7 +141,7 @@ const CreateChatbotPage = () => {
                 type="text"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
                 required
               />
             </div>

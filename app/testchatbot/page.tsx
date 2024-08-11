@@ -1,23 +1,33 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 import Link from 'next/link';
 import ChatbotWindow from '../../components/chatbot';
+import { fetchChatbots, Chatbot } from '../../lib/chatbotsfetch';
 
 
-const CreateChatbotPage = () => {
+const Testchatbotpage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedChatbot, setSelectedChatbot] = useState(null);
 
  const handleChatbotClick = (chatbot: any) => {
     setSelectedChatbot(chatbot);
+    console.log(chatbot);
   };
-  // Dummy list of saved chatbots
-  const savedChatbots = [
-    { id: 1, name: 'Customer Service Bot', company: 'TechCorp' },
-    { id: 2, name: 'Sales Assistant', company: 'RetailGiant' },
-    { id: 3, name: 'IT Support Bot', company: 'ITSolutions' },
-  ];
+  const [savedChatbots, setSavedChatbots] = useState<Chatbot[]>([]);
+
+  useEffect(() => {
+    const getChatbots = async () => {
+      try {
+        const chatbots = await fetchChatbots();
+        setSavedChatbots(chatbots);
+      } catch (error) {
+        console.error('Error fetching chatbots:', error);
+      }
+    };
+    getChatbots();
+  }, []);
+  
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -61,7 +71,25 @@ const CreateChatbotPage = () => {
 
 <div className="mb-8">
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Chatbots</h2>
-      <div className="flex flex-wrap -mx-4">
+          <div className="flex flex-wrap -mx-4">
+        {savedChatbots.map((bot) => (
+          <div key={bot.chatbot_id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8">
+            <button
+              className="w-full bg-white rounded-lg shadow-md overflow-hidden focus:outline-none"
+              onClick={() => handleChatbotClick(bot)}
+            >
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">{bot.chatbot_name}</h3>
+                <p className="text-gray-600">Company: {bot.company_name}</p>
+                <p className="text-gray-600">Role: {bot.role}</p>
+                <p className="text-gray-600">Personality: {bot.personality}</p>
+              </div>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>  
+      {/* <div className="flex flex-wrap -mx-4">
         {savedChatbots.map((bot) => (
           <button
             key={bot.id}
@@ -76,7 +104,7 @@ const CreateChatbotPage = () => {
             </div>
           </button>
         ))}
-      </div>
+      </div> */}
     </div>
     {selectedChatbot && (
         <ChatbotWindow
@@ -85,8 +113,7 @@ const CreateChatbotPage = () => {
         />
       )}
     </div>
-      </div>
   );
 };
 
-export default CreateChatbotPage;
+export default Testchatbotpage;

@@ -2,9 +2,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface Chatbot {
-  id: number;
-  name: string;
-  company: string;
+  chatbot_id: number;
+  chatbot_name: string;
+  company_name: string;
+  role: string;
+  personality: string;
 }
 
 interface Message {
@@ -29,6 +31,7 @@ const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
   useEffect(scrollToBottom, [messages]);
 
   const handleSendMessage = (e: React.FormEvent) => {
+    console.log(chatbot)
     e.preventDefault();
     if (inputMessage.trim() === '') return;
 
@@ -44,17 +47,17 @@ const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
   };
 
   return (
-    <div className="fixed  w-80 h-96 bg-white rounded-lg shadow-lg flex flex-col">
+    <div className="fixed ml-80 mt-80 w-80 h-96 bg-white rounded-lg shadow-lg flex flex-col">
       <div className="bg-gray-800 text-white p-4 rounded-t-lg flex justify-between items-center">
-        <h3 className="font-bold">{chatbot.name}</h3>
-        <button onClick={onClose} className="text-gray-300 hover:text-white">
+        <h3 className="font-bold">{chatbot.chatbot_name}</h3>
+        <button onClick={onClose} className="text-gray-300 hover:text-black">
           &times;
         </button>
       </div>
       <div className="flex-1 p-4 overflow-y-auto">
         {messages.map((message, index) => (
           <div key={index} className={`mb-2 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block p-2 rounded-lg ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            <span className={`inline-block p-2 rounded-lg ${message.sender === 'user' ? 'bg-blue-500 text-black' : 'bg-gray-200 text-gray-800'}`}>
               {message.text}
             </span>
           </div>
@@ -67,7 +70,7 @@ const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
             type="text"
             value={inputMessage}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
-            className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+            className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
             placeholder="Type a message..."
           />
           <button
