@@ -54,7 +54,7 @@ const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
     setInputMessage('');
 
     // send message and chatbot id to backend using axios
-    axios.post('https://dashboard.heroku.com/apps/desolate-bastion-55476/chatwithcustombot', {
+    axios.post('https://desolate-bastion-55476-3d3016c3fa1a.herokuapp.com/chatwithcustombot', {
       chatbot_id: chatbot.chatbot_id,
       input_message: inputMessage,
       session_id: session_id
