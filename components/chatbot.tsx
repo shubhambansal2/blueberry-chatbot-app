@@ -21,8 +21,6 @@ interface ChatbotWindowProps {
   onClose: () => void;
 }
 
-
-
 const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
@@ -52,12 +50,15 @@ const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
     const newMessage: Message = { text: inputMessage, sender: 'user' };
     setMessages([...messages, newMessage]);
     setInputMessage('');
-
     // send message and chatbot id to backend using axios
     axios.post('https://desolate-bastion-55476-3d3016c3fa1a.herokuapp.com/chatwithcustombot', {
       chatbot_id: chatbot.chatbot_id,
       input_message: inputMessage,
       session_id: session_id
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
     .then(response => {
       console.log('Message sent successfully:', response.data);
