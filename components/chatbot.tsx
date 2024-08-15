@@ -1,5 +1,7 @@
 // components/ChatbotWindow.tsx
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+
 
 interface Chatbot {
   chatbot_id: number;
@@ -19,10 +21,13 @@ interface ChatbotWindowProps {
   onClose: () => void;
 }
 
+
+
 const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [session_id, setSessionId] = useState<string>('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,21 +35,40 @@ const ChatbotWindow: React.FC<ChatbotWindowProps> = ({ chatbot, onClose }) => {
 
   useEffect(scrollToBottom, [messages]);
 
+  useEffect(() => {
+    // clear messages when new chatbot is selected
+    setMessages([]);
+    setSessionId(Math.random().toString(36).substring(7));
+  }
+  , [chatbot.chatbot_id]);
+
+  
+
   const handleSendMessage = (e: React.FormEvent) => {
-    console.log(chatbot)
     e.preventDefault();
+
     if (inputMessage.trim() === '') return;
 
     const newMessage: Message = { text: inputMessage, sender: 'user' };
     setMessages([...messages, newMessage]);
     setInputMessage('');
 
-    // Simulate backend response
-    setTimeout(() => {
-      const backendResponse: Message = { text: "Backend Response", sender: 'bot' };
+    // send message and chatbot id to backend using axios
+    axios.post('https://dashboard.heroku.com/apps/desolate-bastion-55476/chatwithcustombot', {
+      chatbot_id: chatbot.chatbot_id,
+      input_message: inputMessage,
+      session_id: session_id
+    })
+    .then(response => {
+      console.log('Message sent successfully:', response.data);
+      // Access response.data.response instead of response.data
+      const backendResponse: Message = { text: response.data.response, sender: 'bot' };
       setMessages(prevMessages => [...prevMessages, backendResponse]);
-    }, 1000);
-  };
+    })
+    .catch(error => {
+      console.error('Error sending message:', error);
+    });
+};
 
   return (
     <div className="fixed ml-80 mt-80 w-80 h-96 bg-white rounded-lg shadow-lg flex flex-col">
