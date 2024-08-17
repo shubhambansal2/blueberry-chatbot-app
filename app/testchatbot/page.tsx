@@ -42,7 +42,7 @@ const Testchatbotpage = () => {
     console.log('Deleting chatbot with ID:', chatbot_id);
     const token = localStorage.getItem('accessToken');
     axios.delete(
-      `http://127.0.0.1:8000/api/users/deletechatbot/${chatbot_id}/`,
+      `https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/deletechatbot/${chatbot_id}/`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
