@@ -4,6 +4,8 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import Link from 'next/link';
 import axios from 'axios';
 import { fetchChatbots, Chatbot } from '../../lib/chatbotsfetch';
+import CreateChatbotBasicDetails from '../../components/create_chatbot_basic_details';
+import DocumentUpload from '../../components/document_upload';
 
 
 
@@ -14,6 +16,13 @@ const CreateChatbotPage = () => {
   const [companyName, setCompanyName] = useState('');
   const [role, setRole] = useState('');
   const [savedChatbots, setSavedChatbots] = useState<Chatbot[]>([]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [actions, setActions] = useState('');
+  const [dataSource, setDataSource] = useState('');
+
+  const handleTabClick = (index: number) => {
+    setCurrentStep(index);
+  }
 
   
   const getChatbots = async () => {
@@ -23,7 +32,7 @@ const CreateChatbotPage = () => {
       } catch (error) {
         console.error('Error fetching chatbots:', error);
       }
-    };
+    }
   
   useEffect(() => {
     getChatbots();
@@ -96,73 +105,95 @@ const CreateChatbotPage = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-8 ml-0 md:ml-64 overflow-auto">
-        <div className="max-w-4xl">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Chatbot</h1>
-          <form 
-            className="bg-white p-6 rounded-lg shadow-md"
-            onSubmit={handleSubmit}
+      <div className="max-w-4xl">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Chatbot</h1>
+
+        {/* Tab Buttons */}
+        <div className="flex border-b mb-8">
+          <button
+            onClick={() => handleTabClick(0)}
+            className={`px-4 py-2 ${
+              currentStep === 0
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
+            }`}
           >
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Personality</label>
-              <input
-                type="text"
-                value={personality}
-                onChange={(e) => setPersonality(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Company Name</label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
-                required
-              />
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Role</label>
-              <input
-                type="text"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
-                required
-              />
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-150"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-150"
-              >
-                Create Chatbot
-              </button>
-            </div>
-          </form>
+            Basic Details
+          </button>
+          <button
+            onClick={() => handleTabClick(1)}
+            className={`px-4 py-2 ${
+              currentStep === 1
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
+            }`}
+          >
+            Sources
+          </button>
+          <button
+            onClick={() => handleTabClick(2)}
+            className={`px-4 py-2 ${
+              currentStep === 2
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
+            }`}
+          >
+            Actions
+          </button>
         </div>
+
+        <form className="bg-white p-6 rounded-lg shadow-md" onSubmit={handleSubmit}>
+          {currentStep === 0 && (
+            <CreateChatbotBasicDetails
+            name={name}
+            setName={setName}
+            personality={personality}
+            setPersonality={setPersonality}
+            companyName={companyName}
+            setCompanyName={setCompanyName}
+          />
+          )}
+          {currentStep === 1 && (
+            <div>
+              {/* Sources Form */}
+             <DocumentUpload />
+            </div>
+          )}
+
+          {currentStep === 2 && (
+            <div>
+              {/* Actions Form */}
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Actions</label>
+                <input
+                  type="text"
+                  value={actions}
+                  onChange={(e) => setActions(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-4 mt-8">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-150"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-150"
+            >
+              {currentStep === 2 ? "Finish" : "Next"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  
         <div className="mb-8">
   < h2 className="text-2xl font-semibold text-gray-800 mb-4 mt-4">Your Chatbots</h2>
   <div className="flex flex-wrap -mx-4">
@@ -181,7 +212,7 @@ const CreateChatbotPage = () => {
       </div>
       </div>
       </div>
-      </div>
+      
   );
 };
 
