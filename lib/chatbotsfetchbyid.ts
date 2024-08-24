@@ -9,6 +9,7 @@ export interface Chatbot {
 function getToken(maxAttempts = 10, interval = 500): Promise<string | null> {
     return new Promise((resolve) => {
       let attempts = 0;
+      console.log('Checking for token...');
   
       function checkToken() {
         const token = localStorage.getItem('accessToken');
