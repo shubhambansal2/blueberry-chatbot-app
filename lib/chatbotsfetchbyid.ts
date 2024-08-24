@@ -1,39 +1,54 @@
 export interface Chatbot {
-    chatbot_id: number;
-    chatbot_name: string;
-    company_name: string;
-    role: string;
-    personality: string;
-  }
-
-  function debugToken() {
-    console.log('Current token in localStorage:', localStorage.getItem('accessToken'));
+  chatbot_id: number;
+  chatbot_name: string;
+  company_name: string;
+  role: string;
+  personality: string;
 }
 
-  function getToken(maxAttempts = 20, interval = 250): Promise<string | null> {
-    return new Promise((resolve) => {
-        let attempts = 0;
-
-        function checkToken() {
-            const token = localStorage.getItem('accessToken');
-            console.log(`Attempt ${attempts + 1}: Token is ${token ? 'present' : 'not present'}`);
-            if (token) {
-                resolve(token);
-            } else if (attempts < maxAttempts) {
-                attempts++;
-                setTimeout(checkToken, interval);
-            } else {
-                console.log('Max attempts reached, no token found');
-                resolve(null);
-            }
-        }
-
-        checkToken();
-    });
+function debugToken() {
+  console.log('Current token in localStorage:', localStorage.getItem('accessToken'));
 }
-  
+
+function getToken(maxAttempts = 20, interval = 250): Promise<string | null> {
+  return new Promise((resolve) => {
+      let attempts = 0;
+
+      function checkToken() {
+          const token = localStorage.getItem('accessToken');
+          console.log(`Attempt ${attempts + 1}: Token is ${token ? 'present' : 'not present'}`);
+          if (token) {
+              resolve(token);
+          } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkToken, interval);
+          } else {
+              console.log('Max attempts reached, no token found');
+              resolve(null);
+          }
+      }
+
+      checkToken();
+  });
+}
+
 export const fetchChatbotById = async (id: number): Promise<Chatbot> => {
   console.log('fetchChatbotById called for id:', id);
+
+  // Set up event listener to receive the token from the parent window
+  window.addEventListener('message', (event) => {
+      // Ensure the message is from the expected origin
+      if (event.origin !== 'https://your-django-backend-url.com') {
+          return; // Ignore messages from other origins
+      }
+
+      if (event.data.type === 'AUTH_TOKEN') {
+          const token = event.data.token;
+          localStorage.setItem('accessToken', token);
+          console.log('Token received and stored:', token);
+      }
+  }, false);
+
   try {
       console.log('Attempting to get token...');
       const token = await getToken();
