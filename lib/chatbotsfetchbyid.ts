@@ -10,6 +10,7 @@ export interface Chatbot {
   export const fetchChatbotById = async (id: number): Promise<Chatbot> => {
     try {
       const token = localStorage.getItem('accessToken'); // Assuming the token is stored in localStorage
+      console.log('Token from localStorage:', token)
       const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${id}/`, {
         method: 'GET',
         headers: {
