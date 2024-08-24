@@ -38,7 +38,9 @@ export const fetchChatbotById = async (id: number): Promise<Chatbot> => {
   // Set up event listener to receive the token from the parent window
   window.addEventListener('message', (event) => {
       // Ensure the message is from the expected origin
+
       if (event.origin !== 'http://127.0.0.1:8000') {
+
           return; // Ignore messages from other origins
       }
 
