@@ -40,11 +40,11 @@ export const fetchChatbotById = async (id: number): Promise<Chatbot> => {
     // Ensure the message is from the expected origin]
     console.log('Message received:', event.data);
     console.log('Message origin:', event.origin);
-    if (event.origin !== 'https://blueberry-chatbot-app.vercel.app') {
-        console.log('Origin mismatch. Message ignored.');
-        return; // Ignore messages from other origins
+    // if (event.origin !== 'https://blueberry-chatbot-app.vercel.app') {
+    //     console.log('Origin mismatch. Message ignored.');
+    //     return; // Ignore messages from other origins
         
-    }
+    // }
 
     if (event.data.type === 'AUTH_TOKEN') {
         const token = event.data.token;
