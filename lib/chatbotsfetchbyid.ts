@@ -40,7 +40,7 @@ export const fetchChatbotById = async (id: number): Promise<Chatbot> => {
     // Ensure the message is from the expected origin]
     console.log('Message received:', event.data);
     console.log('Message origin:', event.origin);
-    if (event.origin !== 'https://mighty-dusk-63104-f38317483204.herokuapp.com') {
+    if (event.origin !== 'https://blueberry-chatbot-app.vercel.app') {
         console.log('Origin mismatch. Message ignored.');
         return; // Ignore messages from other origins
         
