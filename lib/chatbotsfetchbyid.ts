@@ -37,19 +37,21 @@ export const fetchChatbotById = async (id: number): Promise<Chatbot> => {
 
   // Set up event listener to receive the token from the parent window
   window.addEventListener('message', (event) => {
-      // Ensure the message is from the expected origin
+    // Ensure the message is from the expected origin]
+    console.log('Message received:', event.data);
+    console.log('Message origin:', event.origin);
+    if (event.origin !== 'https://blueberry-chatbot-app.vercel.app') {
+        console.log('Origin mismatch. Message ignored.');
+        return; // Ignore messages from other origins
+        
+    }
 
-      if (event.origin !== 'http://127.0.0.1:8000') {
-
-          return; // Ignore messages from other origins
-      }
-
-      if (event.data.type === 'AUTH_TOKEN') {
-          const token = event.data.token;
-          localStorage.setItem('accessToken', token);
-          console.log('Token received and stored:', token);
-      }
-  }, false);
+    if (event.data.type === 'AUTH_TOKEN') {
+        const token = event.data.token;
+        localStorage.setItem('accessToken', token);
+        console.log('Token received and stored:', token);
+    }
+}, false);
 
   try {
       console.log('Attempting to get token...');
