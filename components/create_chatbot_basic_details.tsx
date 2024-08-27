@@ -5,6 +5,8 @@ type CreateChatbotBasicDetailsProps = {
   setName: (name: string) => void;
   personality: string;
   setPersonality: (personality: string) => void;
+  role: string;
+  setRole: (role: string) => void;
   companyName: string;
   setCompanyName: (companyName: string) => void;
 };
@@ -15,7 +17,9 @@ const CreateChatbotBasicDetails = ({
   personality,
   setPersonality,
   companyName,
-  setCompanyName
+  setCompanyName,
+  role,
+  setRole
 }: CreateChatbotBasicDetailsProps) => {
   return (
     <div>
@@ -35,6 +39,16 @@ const CreateChatbotBasicDetails = ({
           type="text"
           value={personality}
           onChange={(e) => setPersonality(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-2">Role</label>
+        <input
+          type="text"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200 text-black"
           required
         />
