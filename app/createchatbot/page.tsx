@@ -8,7 +8,6 @@ import CreateChatbotBasicDetails from '../../components/create_chatbot_basic_det
 import DocumentUpload from '../../components/document_upload';
 
 
-
 const CreateChatbotPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [name, setName] = useState('');
@@ -69,6 +68,13 @@ const CreateChatbotPage = () => {
     .catch(error => {
       console.error('Error creating chatbot:', error);
     });
+    setName('');
+    setPersonality('');
+    setCompanyName('');
+    setRole('');
+
+    alert('Chatbot created successfully');
+
   };
 
   const handleCancel = () => {
@@ -145,13 +151,15 @@ const CreateChatbotPage = () => {
         <form className="bg-white p-6 rounded-lg shadow-md" onSubmit={handleSubmit}>
           {currentStep === 0 && (
             <CreateChatbotBasicDetails
-            name={name}
-            setName={setName}
-            personality={personality}
-            setPersonality={setPersonality}
-            companyName={companyName}
-            setCompanyName={setCompanyName}
-          />
+                name={name}
+                setName={setName}
+                personality={personality}
+                setPersonality={setPersonality}
+                role={role}
+                setCompanyName={setCompanyName}
+                companyName={companyName}
+                setRole={setRole}
+            />
           )}
           {currentStep === 1 && (
             <div>
@@ -187,14 +195,14 @@ const CreateChatbotPage = () => {
               type="submit"
               className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-150"
             >
-              {currentStep === 2 ? "Finish" : "Next"}
+              {currentStep === 2 ? "Finish" : "Create"}
             </button>
           </div>
         </form>
       </div>
     </div>
   
-        <div className="mb-8">
+  {/* <div className="mb-8">
   < h2 className="text-2xl font-semibold text-gray-800 mb-4 mt-4">Your Chatbots</h2>
   <div className="flex flex-wrap -mx-4">
   {savedChatbots.map((bot) => (
@@ -207,11 +215,8 @@ const CreateChatbotPage = () => {
           <p className="text-gray-600">Personality: {bot.personality}</p>
         </div>
       </div>
+    </div> */}
     </div>
-      ))}
-      </div>
-      </div>
-      </div>
       
   );
 };
