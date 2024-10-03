@@ -77,6 +77,8 @@ const Testchatbotpage = () => {
             <Link href="/createchatbot">Create Chatbots</Link></li>
             <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">
             <Link href="/testchatbot">Test Chatbots</Link></li>
+            <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">
+            <Link href="/chatbotmessages">Conversations</Link></li>
             <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">Integrations</li>
             <li className="hover:bg-gray-200 p-2 rounded cursor-pointer transition duration-150">Resources</li>
           </ul>
