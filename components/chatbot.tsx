@@ -25,24 +25,46 @@ const ChatbotWindow = ({ chatbot, onClose }: { chatbot: Chatbot; onClose: () => 
   const handleSendMessage = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (inputMessage.trim() === '') return;
-
+  
     const newMessage = { text: inputMessage, sender: 'user' };
     setMessages(prevMessages => [...prevMessages, { ...newMessage, type: 'default' }]);
     setInputMessage('');
-
+  
+    // Retrieve user ID from localStorage
+    const userId = localStorage.getItem('user');
+    if (!userId) {
+      console.error('User ID not found in localStorage');
+      return;
+    }
+  
     try {
-      const response = await axios.post('https://desolate-bastion-55476-3d3016c3fa1a.herokuapp.com/chatwithcustombot', {
+      const response = await axios.post('http://127.0.0.1:5100/chatwithcustombot', {
         chatbot_id: chatbot.chatbot_id,
         input_message: inputMessage,
         session_id: sessionId
       }, {
         headers: { 'Content-Type': 'application/json' }
       });
-
+  
       const botResponse = { text: response.data.response, sender: 'bot' };
       setMessages(prevMessages => [...prevMessages, { ...botResponse, type: 'default' }]);
+  
+      // New API call to save messages to the database
+      await axios.post(`http://localhost:8000/api/users/chatbot/${chatbot.chatbot_id}/${userId}/save_message_to_db/`, {
+        session_id: sessionId,
+        consumer_id: "1", // Assuming this is a constant value, adjust if needed
+        message: inputMessage,
+        bot_message: response.data.response
+      }, {
+        headers: { 'Content-Type': 'application/json' }
+      }).then(response => {
+        console.log('Message saved to database:', response.data);
+      }
+      ).catch(error => {
+        console.error('Error saving message to database:', error);
+      });
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error sending message or saving to database:', error);
       setMessages(prevMessages => [...prevMessages, { text: "Sorry, I'm having trouble responding right now.", sender: 'bot', type: 'default' }]);
     }
   };
