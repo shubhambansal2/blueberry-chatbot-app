@@ -10,5 +10,4 @@ const CreateChatbotPage = () => {
   );
 };
 
-// export default CreateChatbotPage;
 export default AppWrapperHOC(CreateChatbotPage);

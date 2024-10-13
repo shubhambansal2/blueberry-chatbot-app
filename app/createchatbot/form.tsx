@@ -75,7 +75,7 @@ const Form = () => {
     }
     
     return (
-    <Fragment className='absolute inset-0 flex flex-col justify-between p-24'>
+    <Fragment>
       {/* steps */}
       <nav aria-label='Progress'>
         <ol role='list' className='space-y-4 md:flex md:space-x-8 md:space-y-0'>

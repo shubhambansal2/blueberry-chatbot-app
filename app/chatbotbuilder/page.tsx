@@ -1,9 +1,9 @@
 'use client'
 import React, { useState, useCallback } from 'react';
-import ReactFlow, { 
-  addEdge, 
-  Background, 
-  Controls, 
+import ReactFlow, {
+  addEdge,
+  Background,
+  Controls,
   MiniMap,
   Node,
   Edge,

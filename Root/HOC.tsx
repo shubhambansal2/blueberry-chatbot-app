@@ -3,6 +3,7 @@
 import React, { Fragment, ReactNode, ComponentType, useState, useEffect } from 'react';
 import LandingHeader from '../components/Header/LandingHeader';
 import LandingFooter from '../components/Footer/LandingFooter';
+import { useRouter } from 'next/navigation';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -10,7 +11,7 @@ import {
   DashboardOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, theme } from 'antd';
+import { Button, Layout, Menu, theme, MenuProps, ConfigProvider  } from 'antd';
 
 const { Header, Sider, Content } = Layout;
 
@@ -26,6 +27,9 @@ function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
   // This HOC component wraps a given component with a header and footer layout
   return function AppWrapper(props: AppWrapperHOCProps) {
     const [collapsed, setCollapsed] = useState(false);
+    const {
+      token: { colorBgContainer, borderRadiusLG },
+    } = theme.useToken();
 
     // return (
       //   <Fragment>
@@ -34,37 +38,58 @@ function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
       //     <LandingFooter />
       //   </Fragment>
       // );
+      const router = useRouter(); // useRouter hook from Next.js
+
+      const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+        // Use router.push() for programmatic navigation
+        router.push(key as string); // Cast key to string
+      };
+
     return (
       <Layout>
         <Sider trigger={null} collapsible collapsed={collapsed}>
-          <div className="demo-logo-vertical" />
+          <div 
+          style={{ 
+            padding: 0, 
+            background: 'rgba(255, 255, 255, 0.5)',  // Light transparent white
+            // background: theme.useToken().colorBgContainer
+            height: '34px',
+            margin: '16px',
+            borderRadius: '6px',
+         }} > Hello AI World </div>
           <Menu
             theme="dark"
             mode="inline"
-            defaultSelectedKeys={['1']}
+            defaultSelectedKeys={['/']}
+            onClick={handleMenuClick}
             items={[
               {
-                key: '1',
+                key: '/',
                 icon: <DashboardOutlined/>,
                 label: 'Dashboard',
               },
               {
-                key: '2',
+                key: '/createchatbot',
+                icon: <VideoCameraOutlined />,
+                label: 'Create Chatbots',
+              },
+              {
+                key: '/testchatbot',
                 icon: <VideoCameraOutlined />,
                 label: 'Test Chatbots',
               },
               {
-                key: '3',
+                key: '/chatbotmessages',
                 icon: <UploadOutlined />,
                 label: 'Conversations',
               },
               {
-                key: '4',
+                key: '/integrations',
                 icon: <UploadOutlined />,
                 label: 'Integrations',
               },
               {
-                key: '5',
+                key: '/resources',
                 icon: <UploadOutlined />,
                 label: 'Resources',
               },
@@ -73,7 +98,10 @@ function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
         </Sider>
         <Layout>
           <Header 
-          // style={{ padding: 0, background: theme.useToken().colorBgContainer }}
+          style={{ 
+            padding: 0, 
+          // background: theme.useToken().colorBgContainer
+         }}
           >
             <Button
               type="text"
@@ -83,6 +111,8 @@ function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
                 fontSize: '16px',
                 width: 64,
                 height: 64,
+                color: '#fff',
+                padding: 0
               }}
             />
           </Header>
@@ -111,7 +141,24 @@ const AppWrapperLayout: React.FC<AppWrapperProps> = ({ children }) => {
     };
   }, []);
 
-  return <Fragment>{children}</Fragment>;
+  return (
+    <ConfigProvider
+    theme={{
+      token: {
+        // Seed Token
+        colorPrimary: '#00b96b',
+        borderRadius: 2,
+
+        // Alias Token
+        colorBgContainer: '#f6ffed',
+      },
+    }}
+  >
+  <Fragment>
+    {children}
+  </Fragment>
+  </ConfigProvider>
+  );
 };
 
 export { AppWrapperHOC, AppWrapperLayout };
