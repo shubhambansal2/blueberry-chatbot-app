@@ -31,3 +31,105 @@ body {
     text-wrap: balance;
   }
 }
+
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.dashboard-container {
+  background: #ffffff;
+  padding: 0px 40px;
+  height: 84vh;
+  width: 100%;
+  overflow: scroll;
+}
+.btn-green{
+  border-radius: 25px;
+  background-color: #5BAE47;
+  font-weight: 500;
+  padding: 12px 45px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 18px;
+  box-shadow: 0px 10px 10px 0px #22671263;
+}
+.input{
+ border: #C9C9C9 solid 1px;
+ background: #F6F6F6;
+ border-radius: 6px;
+ padding: 10px 20px;
+}
+.upload-btn, .ant-upload{
+  width: 100%;
+}
+.upload-btn button{
+  width: 100%;
+    padding: 10px 20px;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.select{
+ border-radius: 6px;
+ height: 44px;
+ width: 100%;
+}
+.select .ant-select-selector{
+  background-color: #F6F6F6 !important;
+  border: 1px solid #d9d9d9 !important;
+}
+
+.click-btn{
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: #333333 dashed 1px;
+  line-height: 150px;
+  text-align: center;
+}
+
+.btn-black-outline{
+  border-radius: 25px;
+  background-color: #ffffff;
+  font-weight: 500;
+  padding: 12px 45px;
+  border: #5A5A5A solid 1px;
+  color: #5A5A5A;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.whatsapp-input .ant-input-group-addon:first-child{
+    background: #F6F6F6;
+    width: 45px;
+    border-right: 0px;
+}
+.whatsapp-input .ant-input-group-addon:last-child{
+    background: #F6F6F6;
+    width: 45px;
+    border-left: 0px;
+}
+.whatsapp-input .ant-input{
+    background: #F6F6F6;
+    padding: 10px 20px;
+    border-right: 0px;
+    border-left: 0px;
+}
+.whatsapp-input.no-whatsapp .ant-input{
+    background: #F6F6F6;
+    padding: 10px 20px;
+    border-right: 0px;
+    border-left: #d9d9d9 solid 1px;
+}
+.whatsapp-input .ant-input:focus{
+  border-color: none;
+  box-shadow: none;
+}
+.whatsapp-input .ant-input:hover{
+  border-color: none;
+  box-shadow: none;
+}
