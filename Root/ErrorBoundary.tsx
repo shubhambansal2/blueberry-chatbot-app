@@ -36,9 +36,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <br />
             Oops! Something went wrong.
           </h1>
-          <button type="button" onClick={() => utils.getWindowInstance().location.replace('/dashboard')}>
+          {/* <button type="button" onClick={() => utils.getWindowInstance().location.replace('/dashboard')}>
             Take me Home
-          </button>
+          </button> */}
         </div>
       );
     }

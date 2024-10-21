@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 
-const DocumentUpload = () => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+interface DocumentUploadProps {
+  setFileData: (file: File | null) => void;
+  fileData: File | null;
+}
+
+const DocumentUpload: React.FC<DocumentUploadProps> = ({setFileData, fileData}) => {
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -10,23 +15,26 @@ const DocumentUpload = () => {
     
     // Validate file type
     if (file && (file.type === 'application/pdf' || file.type === 'text/plain')) {
-      setSelectedFile(file);
+      // setSelectedFile(file);
+      setFileData(file);
       setMessage(''); // Reset any error messages
     } else {
       setMessage('Please upload a valid PDF or TXT file.');
-      setSelectedFile(null);
+      // setSelectedFile(null);
+      setFileData(file);
     }
   };
 
   const handleFileUpload = () => {
-    if (selectedFile) {
+    if (fileData) {
       setIsProcessing(true);
       
       // Simulate document processing (could be replaced by an API call)
       setTimeout(() => {
         setIsProcessing(false);
-        setMessage(`Your document "${selectedFile.name}" has been processed successfully!`);
-        setSelectedFile(null); // Reset the file input
+        setMessage(`Your document "${fileData.name || ''}" has been processed successfully!`);
+        // setSelectedFile(null); // Reset the file input
+        setFileData(null);
       }, 2000); // Simulate a 2-second processing time
     }
   };
@@ -42,9 +50,9 @@ const DocumentUpload = () => {
         className="mb-4"
       />
       
-      {selectedFile && (
+      {fileData && (
         <div className="mb-4">
-          <p>Selected File: {selectedFile.name}</p>
+          <p>Selected File: {fileData.name}</p>
           <button
             onClick={handleFileUpload}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-150"

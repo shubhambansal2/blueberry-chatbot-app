@@ -20,13 +20,15 @@ interface AppWrapperProps {
 }
 
 interface AppWrapperHOCProps {
-  [key: string]: any; // For props passed to the wrapped component
+  // [key: string]: any; // For props passed to the wrapped component
 }
 
 function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
   // This HOC component wraps a given component with a header and footer layout
-  return function AppWrapper(props: AppWrapperHOCProps) {
+  return function AppWrapper(props: T) {
     const [collapsed, setCollapsed] = useState(false);
+    const [selectedKey, setSelectedKey] = useState('/');
+
     const {
       token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
@@ -43,6 +45,9 @@ function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
       const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
         // Use router.push() for programmatic navigation
         router.push(key as string); // Cast key to string
+        console.log('selected', key as string)
+        console.log('selectedkey', selectedKey)
+        setSelectedKey(key as string); // Update the selected key on click
       };
 
     return (
@@ -60,7 +65,7 @@ function AppWrapperHOC<T extends object>(WrappedComponent: ComponentType<T>) {
           <Menu
             theme="dark"
             mode="inline"
-            defaultSelectedKeys={['/']}
+            selectedKeys={[selectedKey]}
             onClick={handleMenuClick}
             items={[
               {
