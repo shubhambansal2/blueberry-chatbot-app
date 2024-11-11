@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Message } from 'postcss';
-import { Chatbot } from '@/lib/chatbotsfetch';
+import { Chatbot } from '../lib/chatbotsfetch';
 
 const ChatbotWindow = ({ chatbot, onClose }: { chatbot: Chatbot; onClose: () => void }) => {
   const [isMinimized, setIsMinimized] = useState(true);
