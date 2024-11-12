@@ -3,12 +3,16 @@ import { useChatbotStore } from '../../store/useChatbotStore';
 import { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
 import ImageUpload from '../ImageUpload';
+import ColorSelector, { ChatbotColor } from '../ui/ColourSelector';
+
+
 
 interface ChatbotDetailsInputs {
   name: string;
   avatar: FileList;
   personality: string;
   description: string;
+  color: ChatbotColor | null;
 }
 
 export const ChatbotDetailsForm = () => {
@@ -26,6 +30,7 @@ export const ChatbotDetailsForm = () => {
       name: chatbotDetails.name,
       personality: chatbotDetails.personality,
       description: chatbotDetails.description,
+      color: chatbotDetails.color || null,
     },
   });
 
@@ -38,6 +43,7 @@ export const ChatbotDetailsForm = () => {
       name: data.name,
       personality: data.personality,
       description: data.description,
+      color: data.color,
     };
     updateChatbotDetails(formData);
   }, 500);
@@ -48,8 +54,9 @@ export const ChatbotDetailsForm = () => {
       name: watchedFields.name,
       personality: watchedFields.personality,
       description: watchedFields.description,
+      color: watchedFields.color,
     });
-  }, [watchedFields.name, watchedFields.personality, watchedFields.description]);
+  }, [watchedFields.name, watchedFields.personality, watchedFields.description, watchedFields.color]);
 
   const handleAvatarChange = (file: File | null) => {
     if (file) {
@@ -66,6 +73,10 @@ export const ChatbotDetailsForm = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleColorChange = (color: ChatbotColor) => {
+    updateChatbotDetails({ color });
   };
 
   return (
@@ -85,6 +96,11 @@ export const ChatbotDetailsForm = () => {
           <p className="text-sm text-red-500">{errors.name.message}</p>
         )}
       </div>
+
+      {/* <ColorSelector
+        value={watchedFields.color}
+        onChange={handleColorChange}
+      /> */}
 
       <div className="space-y-2">
         <label htmlFor="personality" className="block text-sm font-medium">

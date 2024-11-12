@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Plus, Trash2, Link, FileText } from 'lucide-react';
-import { debounce } from 'lodash';
+import { useChatbotStore } from '../../store/useChatbotStore';
 
 export type FileData = {
   file: File | null;
@@ -10,120 +10,63 @@ export type FileData = {
 
 interface DataSourcesInputs {
   websites: Array<{ value: string }>;
-  documents: FileData[];
 }
 
 export const DataSourcesForm = () => {
-  const { dataSources, updateDataSources } = { 
-    dataSources: { websites: [], documents: [] }, 
-    updateDataSources: (data: any) => console.log('Update data sources:', data) 
-  };
-  const [documentPreviews, setDocumentPreviews] = useState<FileData[]>(
-    dataSources.documents || []
-  );
+  // Get store data and update function separately
+  const dataSources = useChatbotStore(state => state.dataSources);
+  const updateDataSources = useChatbotStore(state => state.updateDataSources);
 
-  const {
-    register,
-    control,
-    watch,
-    formState: { errors },
-    setError,
-    clearErrors,
-  } = useForm<DataSourcesInputs>({
+  const { register, control, formState: { errors }, watch } = useForm<DataSourcesInputs>({
     defaultValues: {
-      websites: [{ value: '' }],
-      documents: [],
-    },
+      websites: dataSources.websites || [{ value: '' }]
+    }
   });
 
-  const {
-    fields: websiteFields,
-    append: appendWebsite,
-    remove: removeWebsite,
-  } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
-    name: 'websites',
+    name: 'websites'
   });
 
-  // Watch website fields
-  const watchedFields = watch();
-
-  // URL validation regex
-  const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-
-  // Debounced update function
-  const debouncedUpdate = debounce((data: DataSourcesInputs) => {
+  // Watch for changes in the websites field and update the store
+  const websites = watch('websites');
+  React.useEffect(() => {
     updateDataSources({
-      websites: data.websites,
-      documents: data.documents,
+      ...dataSources,
+      websites
     });
-  }, 500);
+  }, [websites]);
 
-  // Update store when website values change
-  useEffect(() => {
-    debouncedUpdate({
-      websites: watchedFields.websites,
-      documents: documentPreviews,
-    });
-
-    return () => {
-      debouncedUpdate.cancel();
-    };
-  }, [watchedFields.websites, documentPreviews]);
-
-  // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files?.length) return;
 
-    const newFiles: FileData[] = [];
     const fileArray = Array.from(files);
+    const newFiles: FileData[] = [];
 
     fileArray.forEach(file => {
-      if (file.type !== 'application/pdf') {
-        setError('documents', {
-          type: 'manual',
-          message: 'Only PDF files are allowed',
-        });
-        return;
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        setError('documents', {
-          type: 'manual',
-          message: 'File size should not exceed 10MB',
-        });
-        return;
-      }
-
       const reader = new FileReader();
       reader.onloadend = () => {
         const preview = reader.result as string;
         newFiles.push({ file, preview });
         
-        setDocumentPreviews(prev => {
-          const updated = [...prev, ...newFiles];
-          debouncedUpdate({ 
-            websites: watchedFields.websites,
-            documents: updated 
+        if (newFiles.length === fileArray.length) {
+          const currentDocuments = dataSources.documents || [];
+          updateDataSources({
+            ...dataSources,
+            documents: [...currentDocuments, ...newFiles]
           });
-          return updated;
-        });
+        }
       };
       reader.readAsDataURL(file);
     });
-
-    clearErrors('documents');
   };
 
   const handleRemoveDocument = (index: number) => {
-    setDocumentPreviews(prev => {
-      const updated = prev.filter((_, i) => i !== index);
-      debouncedUpdate({ 
-        websites: watchedFields.websites,
-        documents: updated 
-      });
-      return updated;
+    const updatedDocuments = (dataSources.documents || []).filter((_, i) => i !== index);
+    updateDataSources({
+      ...dataSources,
+      documents: updatedDocuments
     });
   };
 
@@ -135,7 +78,7 @@ export const DataSourcesForm = () => {
           <label className="block text-sm font-medium">Website Links</label>
           <button
             type="button"
-            onClick={() => appendWebsite({ value: '' })}
+            onClick={() => append({ value: '' })}
             className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -144,7 +87,7 @@ export const DataSourcesForm = () => {
         </div>
 
         <div className="space-y-3">
-          {websiteFields.map((field, index) => (
+          {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-center">
               <div className="flex-grow">
                 <div className="relative">
@@ -153,24 +96,14 @@ export const DataSourcesForm = () => {
                     type="text"
                     className="w-full pl-10 rounded-xl shadow-sm border border-gray-100 placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="Enter website URL"
-                    {...register(`websites.${index}.value`, {
-                      pattern: {
-                        value: urlPattern,
-                        message: 'Please enter a valid URL',
-                      },
-                    })}
+                    {...register(`websites.${index}.value`)}
                   />
                 </div>
-                {errors.websites?.[index]?.value && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.websites[index]?.value?.message}
-                  </p>
-                )}
               </div>
-              {websiteFields.length > 1 && (
+              {fields.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => removeWebsite(index)}
+                  onClick={() => remove(index)}
                   className="text-red-500 hover:text-red-600 transition-colors p-2"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -208,14 +141,10 @@ export const DataSourcesForm = () => {
           </label>
         </div>
 
-        {errors.documents && (
-          <p className="text-sm text-red-500">{errors.documents.message}</p>
-        )}
-
         {/* Document Previews */}
-        {documentPreviews.length > 0 && (
+        {dataSources.documents?.length > 0 && (
           <div className="space-y-3">
-            {documentPreviews.map((doc, index) => (
+            {dataSources.documents.map((doc, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"

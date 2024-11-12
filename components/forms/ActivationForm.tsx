@@ -24,7 +24,26 @@ const ActivationForm = () => {
   const handleActivate = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const accessToken = localStorage.getItem('accessToken');
+      const user = localStorage.getItem('user');
+      const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          chatbot_name: chatbotDetails.name,
+          company_name: companyDetails.companyName,
+          role: chatbotDetails.description,
+          personality: chatbotDetails.personality,
+          user: user
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create chatbot');
+      }
       // Reset the form before navigation
       resetForm();
       router.push('/testchatbot');

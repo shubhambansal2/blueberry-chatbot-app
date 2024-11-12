@@ -4,21 +4,25 @@ import { FloatingDock } from "../../../components/ui/Floating_dock";
 import { BackgroundGradient } from '../../../components/ui/background_gradient';
 import Link from 'next/link';
 import { useChatbotStore } from '../../../store/useChatbotStore';
-
-import {
-  IconMessageChatbot,
-  IconBuildings,
-  IconFloatLeft,
-  IconDatabase,
-  IconNewSection,
-  IconChecks,
-} from "@tabler/icons-react";
+import { useRouter } from 'next/navigation';
+import ActivationDialog from '../../../components/ActivationDialogue';
 import { CompanyDetailsForm } from '../../../components/forms/CompanyDetailsForm';
 import { DataSourcesForm } from '../../../components/forms/DataSourcesForm';
 import { ChatbotDetailsForm } from '../../../components/forms/ChatbotDetailsForm';
 import { SpecialInstructionsForm } from '@components/forms/SpecialInstructionsForm';
 import  ActivationForm  from '../../../components/forms/ActivationForm';
 
+import {
+  IconMessageChatbot,
+  IconBuildings,
+  IconFloatLeft,
+  IconDatabase,
+  IconChecks,
+} from "@tabler/icons-react";
+
+// const {
+//   resetForm
+// } = useChatbotStore();
 
 const formComponents: Record<string, React.FC> = {
   'company-details': CompanyDetailsForm,
@@ -31,6 +35,10 @@ const formComponents: Record<string, React.FC> = {
 
 
 const CreateChatbotPage = () => {
+  
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const items = [
    
     {
@@ -78,26 +86,14 @@ const CreateChatbotPage = () => {
       ),
       href: "#",
     }
-    // {
-    //   id: "deployment",
-    //   title: "Deployment",
-    //   details: "Enter the deployment details",
-    //   icon: (
-    //     <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-    //   ),
-    //   href: "#",
-    // },
+   
   ];
-
 
   const [selectedId, setSelectedId] = useState<string>("chatbot-details");
   const CurrentForm = selectedId ? formComponents[selectedId] : null;
 
-
   return (
-    // <div className="flex-1 p-8 overflow-auto bg-white min-h-screen">
-    // <div className="h-screen w-full dark:bg-black bg-white  dark:bg-grid-small-white/[0.2] bg-grid-small-black/[0.2] relative flex items-center justify-center">
-      // <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+    
         <div className="container mx-auto max-w-6xl h-full">
         <div className="flex justify-between items-center mb-8 mt-8">
           <h1 className="text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
@@ -112,7 +108,20 @@ const CreateChatbotPage = () => {
           <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px]">
             <div className="absolute inset-[0.5px] rounded-2xl bg-white">
               <div className="w-full h-full p-8 overflow-hidden">
-                {/* Main content container with scroll */}
+              <div className="absolute top-4 right-4 z-50">
+                {(() => {
+                  const chatbotDetails = useChatbotStore().chatbotDetails;
+                  const isValid = Boolean(chatbotDetails.name && 
+                                          chatbotDetails.personality && 
+                                          chatbotDetails.description);
+                  return (
+                    <ActivationDialog 
+                      isValid={isValid}
+                      isLoading={isLoading}
+                    />
+                  );
+                })()}
+              </div>
                 <div className="relative w-full h-full overflow-y-auto">
                   <FloatingDock
                     items={items}
@@ -130,7 +139,6 @@ const CreateChatbotPage = () => {
           </BackgroundGradient>
         </div>
       </div>
-    //  </div>
   );
 };
 

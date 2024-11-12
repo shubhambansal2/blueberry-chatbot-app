@@ -13,12 +13,19 @@ interface CompanyDetails {
   logo?: FileData | null;
 }
 
+interface ChatbotColor {
+  id: string;
+  value: string;
+  name: string;
+}
+
 interface ChatbotDetails {
   name: string;
   avatar?: FileData | null;
   personality: string;
   description: string;
   primaryLanguage: string;
+  color: ChatbotColor | null;
 }
 
 interface SpecialInstructions {
@@ -61,6 +68,7 @@ interface ChatbotState {
   updateActivation: (activation: Partial<Activation>) => void;
   updateDeployment: (deployment: Partial<Deployment>) => void;
   resetForm: () => void;
+  resetChatbotDetails: () => void;
 }
 
 const initialState = {
@@ -77,6 +85,7 @@ const initialState = {
     primaryLanguage: '',
     avatar: null,
     personality: '',
+    color: null,
   },
   specialInstructions: {
     specialinstructions: '',
@@ -98,7 +107,7 @@ const initialState = {
     customCSS: '',
     customScripts: [],
   },
-  currentStep: 'company-details',
+  currentStep: 'chatbot-details',
 };
 
 export const useChatbotStore = create<ChatbotState>()(
@@ -131,6 +140,10 @@ export const useChatbotStore = create<ChatbotState>()(
           deployment: { ...state.deployment, ...deployment },
         })),
       resetForm: () => set(initialState),
+      resetChatbotDetails: () => set({
+        chatbotDetails: initialState.chatbotDetails,
+        companyDetails: initialState.companyDetails
+      }),
     }),
     {
       name: 'chatbot-form-storage',
