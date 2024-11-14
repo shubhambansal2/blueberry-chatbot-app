@@ -1,14 +1,50 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { Loader2, X } from 'lucide-react';
 import ChatbotWindow from '../../../components/chatbot';
 import { fetchChatbots, Chatbot } from '../../../lib/chatbotsfetch';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import GradientButton from '../../../components/ui/GradientChatbotButton';
+import GradientCard from '../../../components/GradientChatbotCard';
+import DeleteDialogue from '../../../components/DeleteDialogue';
+import GlobalLoadingOverlay from '../../../components/GlobalLoadingOverlay';
+import ChatWidget from '../../../components/Chatbot_New';
 
+const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
+  if (!selectedChatbot) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className=" rounded-lg w-full  h-full flex flex-col relative">
+          <ChatWidget
+            chatbotId={selectedChatbot.chatbot_id.toString()}
+            chatbotName={selectedChatbot.chatbot_name}
+            apiKey="ABC"
+          />
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={onClose}
+            className="bg-red-800 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors"
+          >
+            Stop Testing
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Testchatbotpage = () => {
-  const [selectedChatbot, setSelectedChatbot] = useState(null);
+  // const [selectedChatbot, setSelectedChatbot] = useState(null);
+  
+  const handleClose = () => {
+    setSelectedChatbot(null);
+  };
+  const [selectedChatbot, setSelectedChatbot] = useState<Chatbot | null>(null);
   const [savedChatbots, setSavedChatbots] = useState<Chatbot[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
 
   const handleChatbotClick = (chatbot: any) => {
     setSelectedChatbot(chatbot);
@@ -34,33 +70,83 @@ const Testchatbotpage = () => {
     console.log('Editing chatbot with ID:', chatbot_id);
     router.push(`/editchatbot/${chatbot_id}`);
   };
+  const handleDeleteChatbot = async (chatbot_id: number): Promise<void> => {
 
-  const handleDeleteChatbot = (chatbot_id: number): void => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this chatbot? This action cannot be undone.');
+    
+    if (!confirmDelete) {
+      return;
+    }
+    setIsDeleting(true);
+    
+    
     console.log('Deleting chatbot with ID:', chatbot_id);
     const token = localStorage.getItem('accessToken');
-    axios.delete(
-      `https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/deletechatbot/${chatbot_id}/`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+    try {
+      setIsDeleting(true);
+      const response = await axios.delete(
+        `https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/deletechatbot/${chatbot_id}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      })
-      .then((response) => {
-        console.log('Chatbot deleted:', response.data);
-        getChatbots();
-      })
-      .catch((error) => {
-        console.error('Error deleting chatbot:', error);
-      });
+      );
+      console.log('Chatbot deleted:', response.data);
+      await getChatbots();
+    } catch (error) {
+      console.error('Error deleting chatbot:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+      setIsDeleting(false);
+      console.log('Chatbot deleted');
   };
 
   return (
-    // <div className="flex h-screen bg-white w-full">
       <div className="flex-1 p-8 overflow-auto">
         <div className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Chatbots</h2>
-          <div className="flex flex-wrap -mx-4">
+          <div className="flex flex-row items-center space-x-6 overflow-x-auto pb-4 mt-8">
+            <GradientButton />
+            <div className="flex flex-wrap gap-8">
+            {savedChatbots.map((bot, index) => {
+              const colorSchemes = ['maroon', 'ocean', 'forest', 'plum', 'slate', 'sunset'];
+              const colorScheme = colorSchemes[index % colorSchemes.length];
+              
+              return (
+                <div key={bot.chatbot_id} className="flex-shrink-0">
+                  <GradientCard
+                    chatbotName={bot.chatbot_name}
+                    companyName={bot.company_name}
+                    colorScheme={colorScheme as 'maroon' | 'ocean' | 'forest' | 'plum' | 'slate' | 'sunset'}
+                    onEdit={() => handleEditChatbot(bot.chatbot_id)}
+                    onDelete={() => handleDeleteChatbot(bot.chatbot_id)}
+                    onClick={() => handleChatbotClick(bot)}
+                  />
+                </div>
+              );
+            })}
+            </div>
+          </div>
+        </div>
+        {selectedChatbot && <ChatOverlay selectedChatbot={selectedChatbot} onClose={handleClose} />}
+        {/* {selectedChatbot && (
+          <ChatWidget
+            chatbotId={selectedChatbot?.chatbot_id.toString()}
+            chatbotName={selectedChatbot?.chatbot_name}
+            apiKey="ABC"
+          />
+        )} */}
+        {isDeleting && <GlobalLoadingOverlay message="Deleting chatbot..." />}
+      </div>
+  );
+};
+
+export default Testchatbotpage;
+
+ {/* <div className="flex flex-wrap -mx-4 mt-8">
             {savedChatbots.map((bot) => (
               <React.Fragment key={bot.chatbot_id}>
                 <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8">
@@ -109,17 +195,4 @@ const Testchatbotpage = () => {
                 </div>
               </React.Fragment>
             ))}
-          </div>
-        </div>  
-      {/* </div> */}
-      {selectedChatbot && (
-        <ChatbotWindow
-          chatbot={selectedChatbot}
-          onClose={() => setSelectedChatbot(null)}
-        />
-      )}
-    </div>
-  );
-};
-
-export default Testchatbotpage;
+          </div> */}
