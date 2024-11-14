@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Loader2 }from 'lucide-react';
-import { useChatbotStore } from '../../store/useChatbotStore';
+import { editChatbotStore } from '../../store/editChatbotStore';
 
 const ActivationForm = () => {
   const router = useRouter();
@@ -15,7 +15,7 @@ const ActivationForm = () => {
     specialInstructions,
     dataSources,
     resetForm
-  } = useChatbotStore();
+  } = editChatbotStore();
 
   // Debug logs
   console.log('Full Data Sources:', dataSources);
@@ -26,7 +26,8 @@ const ActivationForm = () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       const user = localStorage.getItem('user');
-      const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/', {
+      const chatbot_id = window.location.pathname.split('/').pop();
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${chatbot_id}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

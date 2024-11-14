@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import ChatbotWindow from '../../../components/chatbot';
 import { fetchChatbots, Chatbot } from '../../../lib/chatbotsfetch';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+
 
 const Testchatbotpage = () => {
   const [selectedChatbot, setSelectedChatbot] = useState(null);
@@ -25,6 +27,13 @@ const Testchatbotpage = () => {
   useEffect(() => {
     getChatbots();
   }, []);
+
+  const router = useRouter();
+
+  const handleEditChatbot = (chatbot_id: number) => {
+    console.log('Editing chatbot with ID:', chatbot_id);
+    router.push(`/editchatbot/${chatbot_id}`);
+  };
 
   const handleDeleteChatbot = (chatbot_id: number): void => {
     console.log('Deleting chatbot with ID:', chatbot_id);
@@ -73,10 +82,11 @@ const Testchatbotpage = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           // Define the handleEditBot function here
-                          const handleEditBot = (bot: any) => {
-                            console.log('Editing chatbot:', bot);
-                          };
-                          handleEditBot(bot.chatbot_id);
+                          // const handleEditBot = (bot: any) => {
+                          //   console.log('Editing chatbot:', bot);
+                          //   handleEditBot(bot.chatbot_id);
+                          // };
+                          handleEditChatbot(bot.chatbot_id);
                         }}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

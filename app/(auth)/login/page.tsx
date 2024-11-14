@@ -116,7 +116,7 @@ const SignIn: NextPage = () => {
             <div className="h-px w-1/2 bg-gray-200" />
           </div>
 
-          <div className="mt-4 flex mx-auto justify-center flex-col ">
+          <div className="mt-4 flex mx-auto justify-center items-center flex-col ">
           <GoogleLoginComponent/>
           </div>
           <Link

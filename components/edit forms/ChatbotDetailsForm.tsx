@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useChatbotStore } from '../../store/useChatbotStore';
+import { editChatbotStore } from '../../store/editChatbotStore';
 import { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
 import ImageUpload from '../ImageUpload';
@@ -16,7 +16,7 @@ interface ChatbotDetailsInputs {
 }
 
 export const ChatbotDetailsForm = () => {
-  const { chatbotDetails, updateChatbotDetails } = useChatbotStore();
+  const { chatbotDetails, updateChatbotDetails } = editChatbotStore();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     chatbotDetails.avatar?.preview || null
   );

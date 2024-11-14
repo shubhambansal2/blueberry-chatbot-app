@@ -110,7 +110,7 @@ const initialState = {
   currentStep: 'chatbot-details',
 };
 
-export const useChatbotStore = create<ChatbotState>()(
+export const editChatbotStore = create<ChatbotState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -146,7 +146,7 @@ export const useChatbotStore = create<ChatbotState>()(
       }),
     }),
     {
-      name: 'chatbot-form-storage',
+      name: 'edit-chatbot-form-storage',
     }
   )
 );

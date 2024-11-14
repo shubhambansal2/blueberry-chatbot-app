@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Plus, Trash2, Link, FileText } from 'lucide-react';
-import { useChatbotStore } from '../../store/useChatbotStore';
+import { editChatbotStore } from '../../store/editChatbotStore';
 
 export type FileData = {
   file: File | null;
@@ -14,8 +14,8 @@ interface DataSourcesInputs {
 
 export const DataSourcesForm = () => {
   // Get store data and update function separately
-  const dataSources = useChatbotStore(state => state.dataSources);
-  const updateDataSources = useChatbotStore(state => state.updateDataSources);
+  const dataSources = editChatbotStore(state => state.dataSources);
+  const updateDataSources = editChatbotStore(state => state.updateDataSources);  
 
   const { register, control, formState: { errors }, watch } = useForm<DataSourcesInputs>({
     defaultValues: {
