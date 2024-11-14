@@ -1,5 +1,4 @@
 'use client'
-
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -13,8 +12,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../components/ui/alert-dialog"
-import { useChatbotStore } from '../store/useChatbotStore';
+} from "./ui/alert-dialog"
+import { editChatbotStore } from '../store/editChatbotStore';
 
 type ActivationDialogProps = {
   isValid: boolean;
@@ -24,7 +23,7 @@ type ActivationDialogProps = {
 const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDialogProps) => {
   const [isActivating, setIsActivating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { chatbotDetails, companyDetails, resetChatbotDetails } = useChatbotStore();
+  const { chatbotDetails, companyDetails, resetChatbotDetails } = editChatbotStore();
   const router = useRouter();
 
   const handleActivation = async () => {
@@ -34,7 +33,8 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
     try {
       const accessToken = localStorage.getItem('accessToken');
       const user = localStorage.getItem('user');
-      const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/', {
+      const chatbot_id = window.location.pathname.split('/').pop();
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${chatbot_id}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
             onClick={() => !isActivating && setIsOpen(true)}
           >
             {externalLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>{externalLoading ? 'Activating...' : 'One-Click Activation'}</span>
+            <span>{externalLoading ? 'Activating...' : 'One-Click Save & Activate'}</span>
           </button>
         </AlertDialogTrigger>
         

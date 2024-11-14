@@ -4,15 +4,16 @@ import { FloatingDock } from "@components/ui/Floating_dock";
 import { BackgroundGradient } from '@components/ui/background_gradient';
 import Link from 'next/link';
 import { usePathname, useParams, useRouter } from 'next/navigation';
-import { useChatbotStore } from '../../../../store/useChatbotStore';
+import { editChatbotStore } from '../../../../store/editChatbotStore';
 import ActivationDialog from '@components/ActivationDialogue';
-import { CompanyDetailsForm } from '@components/forms/CompanyDetailsForm';
-import { DataSourcesForm } from '@components/forms/DataSourcesForm';
-import { ChatbotDetailsForm } from '@components/forms/ChatbotDetailsForm';
-import { SpecialInstructionsForm } from '@components/forms/SpecialInstructionsForm';
-import ActivationForm from '@components/forms/ActivationForm';
-import { useNavigationGuard } from '../../../../lib/useNavigationGuard';
+import { CompanyDetailsForm } from '@components/edit forms/CompanyDetailsForm';
+import { DataSourcesForm } from '@components/edit forms/DataSourcesForm';
+import { ChatbotDetailsForm } from '@components/edit forms/ChatbotDetailsForm';
+import { SpecialInstructionsForm } from '@components/edit forms/SpecialInstructionsForm';
+import ActivationForm from '@components/edit forms/ActivationForm';
+import { useBrowserNavigationGuard } from '../../../../lib/useNavigationGuard';
 import LeaveDialog from '@components/EditbotDialogue';
+import ActivationDialogue_Edit from '@components/ActivationDialogue_Edit';
 
 import {
   IconMessageChatbot,
@@ -24,39 +25,48 @@ import {
 
 // Mock API call to fetch chatbot data
 const fetchChatbotData = async (id: string) => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  console.log("Fetching chatbot data for ID:", id);
-
+//   await new Promise(resolve => setTimeout(resolve, 1000));
+  // Make API call to get chatbot data
+  const token = localStorage.getItem('accessToken');
+  const response = await fetch(`http://127.0.0.1:8000/api/users/chatbots/${id}/`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+  
+  const chatbotData = await response.json();
+  console.log("Fetched chatbot data:", chatbotData);
+  
   return {
     companyDetails: {
-      companyName: 'Example Corp',
-      industry: 'Technology',
-      companyDetails: 'A leading technology company',
+      companyName: chatbotData.company_name,
+      industry: '',
+      companyDetails: '',
       logo: null,
     },
     chatbotDetails: {
-      name: 'Tech Support Bot',
-      personality: 'Professional and helpful',
-      description: 'Assists with technical support queries',
+      name: chatbotData.chatbot_name,
+      personality: chatbotData.personality,
+      description: chatbotData.role,
       primaryLanguage: 'English',
       color: { id: '1', value: '#0000FF', name: 'Blue' },
       avatar: null,
     },
     specialInstructions: {
-      specialinstructions: 'Focus on technical support queries',
-      exampleresponses: [
-        { question: 'How do I reset my password?', answer: 'Click on forgot password link...' }
-      ],
+      specialinstructions: '',
+      exampleresponses: [],
     },
     dataSources: {
-      websites: [{ value: 'https://example.com/docs' }],
+      websites: [],
       documents: [],
+      isRagEnabled: chatbotData.is_rag_enabled,
+      ragSource: chatbotData.rag_source
     },
     activation: {
       isActive: true,
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
-      allowedDomains: ['example.com'],
+      startDate: '',
+      endDate: '',
+      allowedDomains: [],
     },
     deployment: {
       platform: 'web',
@@ -82,7 +92,74 @@ const formComponents: Record<string, React.FC> = {
 };
 
 const EditChatbotPage = () => {
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(true);
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = ''; // Standard way to show a prompt in modern browsers
+            }
+        };
+
+        const handlePopState = () => {
+            if (hasUnsavedChanges) {
+                const confirmLeave = window.confirm(
+                    "You have unsaved changes. Do you want to leave without saving?"
+                );
+                if (confirmLeave) {
+                    resetForm();
+                } else {
+                    // Prevent navigation by pushing the current state back
+                    window.history.pushState(null, '', window.location.pathname);
+                }
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [hasUnsavedChanges]);
+
+    
+
+    const resetForm = () => {
+        updateCompanyDetails({
+          companyName: '',
+          industry: '',
+          companyDetails: '',
+          logo: null,
+        });
+        updateChatbotDetails({
+          name: '',
+          personality: '',
+          description: '',
+          primaryLanguage: '',
+          color: null,
+          avatar: null,
+        });
+        updateSpecialInstructions({
+          specialinstructions: '',
+          exampleresponses: [],
+        });
+        updateDataSources({
+          websites: [],
+          documents: [],
+        });
+        updateActivation({
+          isActive: false,
+          startDate: '',
+          endDate: '',
+          allowedDomains: [],
+        });
+        setHasUnsavedChanges(false);
+      };
  
+//   useBrowserNavigationGuard(hasUnsavedChanges, resetForm);
+
  
   const router = useRouter();
   const params = useParams();
@@ -98,17 +175,11 @@ const EditChatbotPage = () => {
     updateDataSources,
     updateActivation,
     updateDeployment,
-  } = useChatbotStore();
+  } = editChatbotStore();
 
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(true);
+  
   
   const [error, setError] = useState<string | null>(null);
-
-  const { showLeaveDialog, onConfirmLeave, onCancelLeave } = useNavigationGuard({
-    hasUnsavedChanges,
-    onNavigate: (path) => router.push(path)
-  });
-
 
   useEffect(() => {
     const loadChatbotData = async () => {
@@ -189,14 +260,13 @@ const EditChatbotPage = () => {
       href: "#activation",
     }
   ];
+  
+  
 
   const [selectedId, setSelectedId] = useState<string>("chatbot-details");
   const CurrentForm = selectedId ? formComponents[selectedId] : null;
 
   
-
-
-
   if (isLoading) {
     return (
       <div className="container mx-auto max-w-6xl py-8">
@@ -211,12 +281,9 @@ const EditChatbotPage = () => {
     <div className="container mx-auto max-w-6xl h-full">
       <div className="flex justify-between items-center mb-8 mt-8">
         <h1 className="text-3xl font-bold text-gray-800">Edit an existing Chatbot</h1>
-        {/* <button
-          onClick={onConfirmLeave}
-          className="bg-red-500 text-white px-4 py-2 rounded"
-        >
-          Leave Page
-        </button> */}
+        <LeaveDialog 
+          onReset={resetForm}
+        />
       </div>
       
       <div className="relative">
@@ -224,7 +291,7 @@ const EditChatbotPage = () => {
           <div className="absolute inset-[0.5px] rounded-2xl bg-white">
             <div className="w-full h-full p-8 overflow-hidden">
               <div className="absolute top-4 right-4 z-50">
-                <ActivationDialog 
+                <ActivationDialogue_Edit 
                   isValid={true}
                   isLoading={isSaving}
                 />
@@ -246,12 +313,6 @@ const EditChatbotPage = () => {
         </BackgroundGradient>
       </div>
 
-      {showLeaveDialog && (
-        <LeaveDialog
-          onConfirm={onConfirmLeave}
-          onCancel={onCancelLeave}
-        />
-      )}
     </div>
   );
 };

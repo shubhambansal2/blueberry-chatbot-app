@@ -1,4 +1,7 @@
-import React from 'react';
+'use client'
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,40 +11,52 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "./ui/alert-dialog";
+  AlertDialogTrigger,
+} from "./ui/alert-dialog"
 
-interface LeaveDialogProps {
-  onConfirm: () => void;
-  onCancel: () => void;
-}
+type LeaveDialogProps = {
+  onReset: () => void;
+};
 
-const LeaveDialog = ({ onConfirm, onCancel }: LeaveDialogProps) => {
+const LeaveDialog = ({ onReset }: LeaveDialogProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const handleLeave = () => {
+    onReset(); // Reset the form
+    setIsOpen(false);
+    router.push('/testchatbot');
+  };
+
   return (
-    <AlertDialog open={true} onOpenChange={onCancel}>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>
+        <button 
+          className="px-4 py-2 text-white bg-red-600 hover:bg-red-400 rounded-md transition-colors"
+        >
+          Leave without saving
+        </button>
+      </AlertDialogTrigger>
+      
       <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-bold text-gray-900">
-            Leave without saving?
+            Leave without saving changes?
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4">
-            <p className="text-gray-600">
-              You have unsaved changes. If you leave, your changes will be lost.
-            </p>
-            <p className="text-sm text-gray-500">
-              Click 'Stay' to continue editing, or 'Leave' to exit without saving.
-            </p>
+          <AlertDialogDescription className="text-gray-600">
+            Your changes will be lost if you leave this page. Are you sure you want to continue?
           </AlertDialogDescription>
         </AlertDialogHeader>
         
         <AlertDialogFooter>
           <AlertDialogCancel 
             className="bg-gray-100 hover:bg-gray-200"
-            onClick={onCancel}
+            onClick={() => setIsOpen(false)}
           >
-            Stay
+            Continue editing
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleLeave}
             className="bg-blue-900 hover:bg-blue-700 text-white"
           >
             Leave

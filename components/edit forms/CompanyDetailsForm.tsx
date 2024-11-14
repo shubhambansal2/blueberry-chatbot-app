@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { useChatbotStore } from '../../store/useChatbotStore';
+import { editChatbotStore } from '../../store/editChatbotStore';
 import { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
 import  ImageUpload from '../ImageUpload';
@@ -13,7 +13,7 @@ interface CompanyDetailsInputs {
 }
 
 export const CompanyDetailsForm = () => {
-  const { companyDetails, updateCompanyDetails } = useChatbotStore();
+  const { companyDetails, updateCompanyDetails } = editChatbotStore();
   const [logoPreview, setLogoPreview] = useState<string | null>(
     companyDetails.logo?.preview || null
   );

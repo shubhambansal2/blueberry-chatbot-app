@@ -1,73 +1,45 @@
-import { useState, useEffect, useCallback } from 'react';
+'use client'
+
+import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-interface NavigationGuardProps {
-  hasUnsavedChanges?: boolean;
-  onNavigate?: (path: string) => void;
-}
-
-export const useNavigationGuard = ({ 
-  hasUnsavedChanges = true,
-  onNavigate 
-}: NavigationGuardProps = {}) => {
+export const useBrowserNavigationGuard = (
+  hasUnsavedChanges: boolean,
+  onReset: () => void
+) => {
   const router = useRouter();
   const pathname = usePathname();
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 
-  // Handle browser back/forward buttons and page refreshes
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
-    };
-
-    if (hasUnsavedChanges) {
-      window.addEventListener('beforeunload', handleBeforeUnload);
+    if (!hasUnsavedChanges) {
+      return;
     }
 
+    let isLeaving = false;
+
+    // Handle browser's back/forward buttons and tab close
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const message = "You have unsaved changes. Are you sure you want to leave?";
+      e.preventDefault();
+      e.returnValue = message;
+
+      // If user decides to leave, the form will be reset in the cleanup function
+      isLeaving = true;
+      return message;
+    };
+
+    // Add event listener for browser navigation
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Cleanup function
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // If we're actually leaving the page (not just unmounting the component),
+      // reset the form
+      if (isLeaving) {
+        onReset();
+      }
     };
-  }, [hasUnsavedChanges]);
-
-  // Handle navigation attempts
-  const handleNavigationAttempt = useCallback((url: string) => {
-    if (hasUnsavedChanges) {
-      setPendingUrl(url);
-      setShowLeaveDialog(true);
-      return false;
-    }
-    return true;
-  }, [hasUnsavedChanges]);
-
-  const handleConfirmLeave = useCallback(() => {
-    setShowLeaveDialog(false);
-    if (pendingUrl && onNavigate) {
-      onNavigate(pendingUrl);
-    }
-    setPendingUrl(null);
-  }, [pendingUrl, onNavigate]);
-
-  const handleCancelLeave = useCallback(() => {
-    setShowLeaveDialog(false);
-    setPendingUrl(null);
-  }, []);
-
-  // Listen for pathname changes
-  useEffect(() => {
-    if (pathname && hasUnsavedChanges) {
-      handleNavigationAttempt(pathname);
-    }
-  }, [pathname, hasUnsavedChanges, handleNavigationAttempt]);
-
-  return {
-    showLeaveDialog,
-    onConfirmLeave: handleConfirmLeave,
-    onCancelLeave: handleCancelLeave,
-    checkNavigation: handleNavigationAttempt
-  };
+  }, [hasUnsavedChanges, onReset, pathname]);
 };
