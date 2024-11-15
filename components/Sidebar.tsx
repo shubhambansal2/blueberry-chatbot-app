@@ -23,16 +23,12 @@ import {
   IconChecklist,
   IconRocket,
   IconBook,
+  IconLogout,
+  IconInbox,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 
-export function CollapsibleSidebar() {
-  return (
-    <SidebarLayout>
-      <Dashboard />
-    </SidebarLayout>
-  );
-}
+
 
 export function SidebarLayout({
   className,
@@ -64,10 +60,17 @@ export function SidebarLayout({
       ),
     },
     {
-      label: "Conversations",
+      label: "Deployment",
+      href: "#",
+      icon: (
+        <IconRocket className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+      ),
+    },
+    {
+      label: "Inbox",
       href: "/chatbotmessages",
       icon: (
-        <IconMessages className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+        <IconInbox className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
     },
     {
@@ -78,102 +81,68 @@ export function SidebarLayout({
       ),
     },
     {
-      label: "Deployment",
-      href: "#",
-      icon: (
-        <IconRocket className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-      ),
-    },
-    {
       label: "Resources",
       href: "#",
       icon: (
         <IconBook className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
-    }
-
+    },
   ];
- 
+
   const [open, setOpen] = useState(true);
-  const [currentPath, setCurrentPath] = useState(() => {
-    // In a browser environment, this would use window.location.pathname
-    // For this example, we'll default to "/"
-    return "/";
-  });
+  const [currentPath, setCurrentPath] = useState(() => "/");
 
   // Update currentPath when the component mounts
   React.useEffect(() => {
     setCurrentPath(window.location.pathname);
   }, []);
+
   return (
-    <div
-    className={cn(
-        "mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-md border border-primary/20 bg-tertiary/10  md:flex-row",
-        "h-screen",
-        className,
-      )}
-    >
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-            <Logo showText={open} />
-            <div className="mt-8 flex flex-col">
-              {primaryLinks.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
+    <div className={cn(
+      "mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-md border border-primary/20 bg-tertiary/10 md:flex-row",
+      "h-screen",
+      className
+    )}>
+      <div className="h-full">
+        <Sidebar open={open} setOpen={setOpen}>
+          <SidebarBody className="flex flex-col h-full">
+            {/* Top Section */}
+            <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+              <Logo showText={open} />
+              <div className="mt-8 flex flex-col">
+                {primaryLinks.map((link, idx) => (
+                  <SidebarLink key={idx} link={link} />
+                ))}
+              </div>
             </div>
-            {/* <div className="mt-4">
-              <div className="h-px w-full bg-neutral-200 "></div>
-              <div className="h-px w-full bg-white "></div>
-            </div> */}
-            {/* <div className="mt-4 flex flex-col">
-              {secondaryLinks.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div> */}
-          </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: "Shubham Bansal",
-                href: "#",
-                icon: <IconUserBolt className="h-5 w-5 flex-shrink-0 text-neutral-700 " />,
-              }}
-            />
-          </div>
-        </SidebarBody>
-      </Sidebar>
-      {children}
+
+            {/* Bottom Section */}
+            <div className="mt-64 pt-72">
+              <SidebarLink
+                link={{
+                  label: "Shubham Bansal",
+                  href: "#",
+                  icon: <IconUserBolt className="h-5 w-5 flex-shrink-0 text-neutral-700" />
+                }}
+              />
+              <SidebarLink
+                link={{
+                  label: "Logout", 
+                  href: "/logout",
+                  icon: <IconLogout className="h-5 w-5 flex-shrink-0 text-neutral-700" />
+                }}
+              />
+            </div>
+          </SidebarBody>
+        </Sidebar>
+      </div>
+
+      <div className="flex-1 overflow-y-auto">{children}</div>
     </div>
   );
 }
 
 
-// Dummy dashboard component with content
-const Dashboard = () => {
-  return (
-    <div className="m-2 flex flex-1">
-      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-2xl border border-neutral-200 bg-white p-2  md:p-10">
-        <div className="flex gap-2">
-          {[...new Array(4)].map((_, i) => (
-            <div
-              key={"first-array" + i}
-              className="h-20 w-full animate-pulse rounded-lg bg-gray-100 "
-            ></div>
-          ))}
-        </div>
-        <div className="flex flex-1 gap-2">
-          {[...new Array(2)].map((_, i) => (
-            <div
-              key={"second-array" + i}
-              className="h-full w-full animate-pulse rounded-lg bg-gray-100 "
-            ></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 interface Links {
   label: string;
@@ -257,38 +226,104 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
     </>
   );
 };
-
 export const DesktopSidebar = ({
-    className,
-    children,
-    ...props
-  }: React.ComponentProps<typeof motion.div>) => {
-    const { open, setOpen } = useSidebar();
-    return (
-      <motion.div
-        className={cn(
-          "group/sidebar-btn relative hidden h-full w-[300px] flex-shrink-0 rounded-xl px-4 py-4 bg-slate-150 md:flex md:flex-col",
-          "border-r border-gray-200 shadow-lg", // Added border and shadow
-          className,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof motion.div>) => {
+  const { open, setOpen } = useSidebar();
+
+  return (
+    <motion.div
+      className={cn(
+        "group/sidebar relative hidden h-full flex-shrink-0 rounded-xl px-4 py-4 bg-slate-150 md:flex md:flex-col",
+        "border-r border-gray-200 shadow-lg", // Added border and shadow
+        className
+      )}
+      onMouseEnter={() => setOpen(true)} // Expand on hover
+      onMouseLeave={() => setOpen(false)} // Collapse when hover ends
+      animate={{
+        width: open ? "300px" : "70px",
+      }}
+      {...props}
+    >
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="transition-opacity duration-500 ease-in-out"
+          >
+            {children}
+          </motion.div>
         )}
+        {!open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="transition-opacity duration-500 ease-in-out"
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+export const SidebarLink = ({
+  link,
+  className,
+  ...props
+}: {
+  link: Links;
+  className?: string;
+  props?: LinkProps;
+}) => {
+  const { open } = useSidebar();
+  const pathname = usePathname();
+  
+  const isActive = pathname === link.href;
+
+  return (
+    <Link
+      href={link.href}
+      className={cn(
+        "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
+        "hover:bg-neutral-100 d",
+        isActive && "bg-primary/10 text-black ",
+        !isActive && "text-neutral-700 ",
+        className,
+      )}
+      {...props}
+    >
+      <div className={cn(
+        "flex-shrink-0 transition-colors",
+        isActive ? "text-black" : "text-neutral-700 ",
+        "group-hover/sidebar:text-black"
+      )}>
+        {link.icon}
+      </div>
+
+      <motion.span
         animate={{
-          width: open ? "300px" : "70px",
+          display: open ? "inline-block" : "none",
+          opacity: open ? 1 : 0,
         }}
-        {...props}
+        transition={{ duration: 0.2 }}
+        className={cn(
+          "!m-0 inline-block whitespace-pre !p-0 text-sm transition duration-150",
+          isActive ? "text-black" : "text-neutral-700 ",
+          "group-hover/sidebar:text-black"
+        )}
       >
-        <button
-          onClick={() => setOpen(!open)}
-          className={cn(
-            "absolute -right-2 top-4 z-40 hidden h-5 w-5 transform items-center justify-center rounded-sm border border-primary/20 bg-white transition duration-200 group-hover/sidebar-btn:flex ",
-            open ? "rotate-0" : "rotate-180",
-          )}
-        >
-          <IconArrowNarrowLeft className="text-black " />
-        </button>
-        {children as React.ReactNode}
-      </motion.div>
-    );
-  };
+        {link.label}
+      </motion.span>
+    </Link>
+  );
+};
 
 export const MobileSidebar = ({
   className,
@@ -338,54 +373,84 @@ export const MobileSidebar = ({
   );
 };
 
-export const SidebarLink = ({
-    link,
-    className,
-    ...props
-  }: {
-    link: Links;
-    className?: string;
-    props?: LinkProps;
-  }) => {
-    const { open } = useSidebar();
-    const pathname = usePathname();
-    
-    const isActive = pathname === link.href;
-  
-    return (
-      <Link
-        href={link.href}
-        className={cn(
-          "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
-          "hover:bg-neutral-100 d",
-          isActive && "bg-primary/10 text-primary ",
-          !isActive && "text-neutral-700 ",
-          className,
-        )}
-        {...props}
-      >
-        <div className={cn(
-          "flex-shrink-0 transition-colors",
-          isActive ? "text-primary" : "text-neutral-700 ",
-          "group-hover/sidebar:text-primary"
-        )}>
-          {link.icon}
-        </div>
-  
-        <motion.span
-          animate={{
-            display: open ? "inline-block" : "none",
-            opacity: open ? 1 : 0,
-          }}
-          transition={{ duration: 0.2 }}
-          className={cn(
-            "!m-0 inline-block whitespace-pre !p-0 text-sm transition duration-150",
-            isActive ? "text-primary" : "text-neutral-700 ",
-            "group-hover/sidebar:text-primary"
-          )}
-        >
-          {link.label}
-        </motion.span>
-      </Link>
-    );
-  };
+
+
+
+  // export function CollapsibleSidebar() {
+  //   return (
+  //     <SidebarLayout>
+  //       <Dashboard />
+  //     </SidebarLayout>
+  //   );
+  // }
+
+
+// Dummy dashboard component with content
+// const Dashboard = () => {
+//   return (
+//     <div className="m-2 flex flex-1">
+//       <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-2xl border border-neutral-200 bg-white p-2  md:p-10">
+//         <div className="flex gap-2">
+//           {[...new Array(4)].map((_, i) => (
+//             <div
+//               key={"first-array" + i}
+//               className="h-20 w-full animate-pulse rounded-lg bg-gray-100 "
+//             ></div>
+//           ))}
+//         </div>
+//         <div className="flex flex-1 gap-2">
+//           {[...new Array(2)].map((_, i) => (
+//             <div
+//               key={"second-array" + i}
+//               className="h-full w-full animate-pulse rounded-lg bg-gray-100 "
+//             ></div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// {
+//   label: "Build New Chatbot",
+//   href: "/createchatbot",
+//   icon: (
+//     <IconTool className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+//   ),
+// },
+// {
+//   label: "Chatbots",
+//   href: "/testchatbot",
+//   icon: (
+//     <IconMessage2Code className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+//   ),
+// },
+// {
+//   label: "Deployment",
+//   href: "#",
+//   icon: (
+//     <IconRocket className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+//   ),
+// },
+// {
+//   label: "Inbox",
+//   href: "/chatbotmessages",
+//   icon: (
+//     <IconInbox className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+//   ),
+// },
+// {
+//   label: "Integrations",
+//   href: "#",
+//   icon: (
+//     <IconApi className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+//   ),
+// },
+
+// {
+//   label: "Resources",
+//   href: "#",
+//   icon: (
+//     <IconBook className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+//   ),
+// }

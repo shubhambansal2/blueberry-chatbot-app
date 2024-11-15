@@ -10,6 +10,11 @@ import GradientCard from '../../../components/GradientChatbotCard';
 import DeleteDialogue from '../../../components/DeleteDialogue';
 import GlobalLoadingOverlay from '../../../components/GlobalLoadingOverlay';
 import ChatWidget from '../../../components/Chatbot_New';
+import Templates from '../../../components/Templates';
+import LoadingSkeletons from '../../../components/LoadingSkeletons';
+import ChatbotLoadingSkeleton from '../../../components/LoadingSkeletons';
+
+
 
 const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
   if (!selectedChatbot) return null;
@@ -37,6 +42,8 @@ const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | 
 
 const Testchatbotpage = () => {
   // const [selectedChatbot, setSelectedChatbot] = useState(null);
+  const [isLoadingChatbots, setIsLoadingChatbots] = useState(true);
+
   
   const handleClose = () => {
     setSelectedChatbot(null);
@@ -55,6 +62,7 @@ const Testchatbotpage = () => {
     try {
       const chatbots = await fetchChatbots();
       setSavedChatbots(chatbots);
+      setIsLoadingChatbots(false);
     } catch (error) {
       console.error('Error fetching chatbots:', error);
     }
@@ -105,42 +113,48 @@ const Testchatbotpage = () => {
   };
 
   return (
-      <div className="flex-1 p-8 overflow-auto">
-        <div className="mb-8">
+      <div className="flex flex-col p-8 overflow-auto">
+        
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Chatbots</h2>
           <div className="flex flex-row items-center space-x-6 overflow-x-auto pb-4 mt-8">
-            <GradientButton />
+          {!isLoadingChatbots && <GradientButton />}
             <div className="flex flex-wrap gap-8">
-            {savedChatbots.map((bot, index) => {
-              const colorSchemes = ['maroon', 'ocean', 'forest', 'plum', 'slate', 'sunset'];
-              const colorScheme = colorSchemes[index % colorSchemes.length];
-              
-              return (
-                <div key={bot.chatbot_id} className="flex-shrink-0">
-                  <GradientCard
-                    chatbotName={bot.chatbot_name}
-                    companyName={bot.company_name}
-                    colorScheme={colorScheme as 'maroon' | 'ocean' | 'forest' | 'plum' | 'slate' | 'sunset'}
-                    onEdit={() => handleEditChatbot(bot.chatbot_id)}
-                    onDelete={() => handleDeleteChatbot(bot.chatbot_id)}
-                    onClick={() => handleChatbotClick(bot)}
-                  />
+            {isLoadingChatbots ? (
+              // Show loading skeletons while loading
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="flex-shrink-0">
+                  <ChatbotLoadingSkeleton />
                 </div>
-              );
-            })}
+              ))
+            ) : (
+              // Show actual chatbots once loaded
+              savedChatbots.map((bot, index) => {
+                const colorSchemes = ['maroon', 'ocean', 'forest', 'plum', 'slate', 'sunset'];
+                const colorScheme = colorSchemes[index % colorSchemes.length];
+                return (
+                  <div key={bot.chatbot_id} className="flex-shrink-0">
+                    <GradientCard
+                      chatbotName={bot.chatbot_name}
+                      companyName={bot.company_name}
+                      colorScheme={colorScheme as 'maroon' | 'ocean' | 'forest' | 'plum' | 'slate' | 'sunset'}
+                      onEdit={() => handleEditChatbot(bot.chatbot_id)}
+                      onDelete={() => handleDeleteChatbot(bot.chatbot_id)}
+                      onClick={() => handleChatbotClick(bot)}
+                    />
+                  </div>
+                );
+              })
+            )}
             </div>
           </div>
-        </div>
         {selectedChatbot && <ChatOverlay selectedChatbot={selectedChatbot} onClose={handleClose} />}
-        {/* {selectedChatbot && (
-          <ChatWidget
-            chatbotId={selectedChatbot?.chatbot_id.toString()}
-            chatbotName={selectedChatbot?.chatbot_name}
-            apiKey="ABC"
-          />
-        )} */}
         {isDeleting && <GlobalLoadingOverlay message="Deleting chatbot..." />}
+        <div className="flex flex-col">
+          <h2 className="text-2xl font-semibold text-gray-800 mt-20">Start with Templates</h2>
+        <Templates />
+        </div>
       </div>
+      
   );
 };
 
