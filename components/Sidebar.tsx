@@ -25,6 +25,11 @@ import {
   IconBook,
   IconLogout,
   IconInbox,
+  IconBook2,
+  IconLink,
+  IconNotebook,
+  IconMailbox,
+  IconInboxOff,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 
@@ -70,23 +75,23 @@ export function SidebarLayout({
       label: "Inbox",
       href: "/chatbotmessages",
       icon: (
-        <IconInbox className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-      ),
-    },
-    {
-      label: "Integrations",
-      href: "#",
-      icon: (
-        <IconApi className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+        <IconInbox  className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
     },
     {
       label: "Resources",
       href: "#",
       icon: (
-        <IconBook className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+        <IconNotebook className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
     },
+    {
+      label: "Integrations (Coming Soon)",
+      href: "#",
+      icon: (
+        <IconApi className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+      ),
+    }
   ];
 
   const [open, setOpen] = useState(true);
@@ -103,11 +108,11 @@ export function SidebarLayout({
       "h-screen",
       className
     )}>
-      <div className="h-full">
+      <div className="h-full relative">
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="flex flex-col h-full">
-            {/* Top Section */}
-            <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+            {/* Top Section with Scrollable Content */}
+            <div className="flex-1 overflow-y-auto">
               <Logo showText={open} />
               <div className="mt-8 flex flex-col">
                 {primaryLinks.map((link, idx) => (
@@ -116,8 +121,8 @@ export function SidebarLayout({
               </div>
             </div>
 
-            {/* Bottom Section */}
-            <div className="mt-64 pt-72">
+            {/* Fixed Bottom Section */}
+            <div className="absolute bottom-0 left-4 right-0 bg-inherit pb-4">
               <SidebarLink
                 link={{
                   label: "Shubham Bansal",
@@ -137,7 +142,9 @@ export function SidebarLayout({
         </Sidebar>
       </div>
 
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      <div className="flex-1 overflow-y-auto">
+        {children}
+      </div>
     </div>
   );
 }
@@ -273,6 +280,8 @@ export const DesktopSidebar = ({
   );
 };
 
+
+
 export const SidebarLink = ({
   link,
   className,
@@ -292,35 +301,42 @@ export const SidebarLink = ({
       href={link.href}
       className={cn(
         "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
-        "hover:bg-neutral-100 d",
-        isActive && "bg-primary/10 text-black ",
-        !isActive && "text-neutral-700 ",
+        "hover:bg-secondary/50",
+        "overflow-hidden",
+        isActive && "bg-primary text-black",
+        !isActive && "text-neutral-700",
         className,
       )}
       {...props}
     >
       <div className={cn(
         "flex-shrink-0 transition-colors",
-        isActive ? "text-black" : "text-neutral-700 ",
+        isActive ? "text-black" : "text-neutral-700",
         "group-hover/sidebar:text-black"
       )}>
         {link.icon}
       </div>
 
-      <motion.span
+      <motion.div
+        initial={false}
         animate={{
-          display: open ? "inline-block" : "none",
-          opacity: open ? 1 : 0,
+          width: open ? "auto" : 0,
+          opacity: open ? 1 : 0
         }}
-        transition={{ duration: 0.2 }}
-        className={cn(
-          "!m-0 inline-block whitespace-pre !p-0 text-sm transition duration-150",
-          isActive ? "text-black" : "text-neutral-700 ",
-          "group-hover/sidebar:text-black"
-        )}
+        transition={{
+          duration: 0.2,
+          ease: "easeInOut"
+        }}
+        className="flex items-center"
       >
-        {link.label}
-      </motion.span>
+        <span className={cn(
+          "inline-block whitespace-nowrap text-sm",
+          isActive ? "text-black" : "text-neutral-700",
+          "group-hover/sidebar:text-black"
+        )}>
+          {link.label}
+        </span>
+      </motion.div>
     </Link>
   );
 };
