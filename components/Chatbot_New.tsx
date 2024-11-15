@@ -189,7 +189,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
           isTyping: true 
         } as Message;
         setMessages([welcomeMessage]);
-        typeWriterEffect(welcomeMessageId, `Hi! I&apos;m ${chatbotName}. How may I assist you today?`);
+        typeWriterEffect(welcomeMessageId, `Hi! I am ${chatbotName}. How may I assist you today?`);
         if (botAudioRef.current) {
           botAudioRef.current.play();
         }
@@ -309,7 +309,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
             
             {isFirstTimeOpen && (
               <div className="absolute bottom-20 right-0 bg-white text-gray-800 rounded-lg shadow-lg p-4 w-64 chat-widget-enter">
-                <p className="text-sm">👋 Hi there! Need help? I&apos;m here to assist you.</p>
+                <p className="text-sm">👋 Hi there! Need help? I am here to assist you.</p>
                 <div 
                   className="absolute -bottom-2 right-6 w-4 h-4 bg-white transform rotate-45"
                   style={{ clipPath: 'polygon(0 0, 100% 100%, 100% 0)' }}

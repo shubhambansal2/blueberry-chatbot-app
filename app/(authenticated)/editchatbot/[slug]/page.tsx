@@ -28,7 +28,7 @@ const fetchChatbotData = async (id: string) => {
 //   await new Promise(resolve => setTimeout(resolve, 1000));
   // Make API call to get chatbot data
   const token = localStorage.getItem('accessToken');
-  const response = await fetch(`http://127.0.0.1:8000/api/users/chatbots/${id}/`, {
+  const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${id}/`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     }
