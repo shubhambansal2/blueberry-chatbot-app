@@ -16,7 +16,7 @@ const Logo = ({
     <Link
       href="/"
       className={twMerge(
-        "font-bold text-sm flex ml-2 text-black items-center",
+        "font-bold text-sm justify-center flex ml-2 text-black items-center",
         logoClassName
       )}
     >
