@@ -66,7 +66,7 @@ export function SidebarLayout({
     },
     {
       label: "Deployment",
-      href: "#",
+      href: "/deploychatbot",
       icon: (
         <IconRocket className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
