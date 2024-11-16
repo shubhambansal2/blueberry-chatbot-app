@@ -93,7 +93,7 @@ const CreateChatbotPage = () => {
   const CurrentForm = selectedId ? formComponents[selectedId] : null;
 
   return (
-    <div className="container mx-auto max-w-6xl h-full">
+    <div className="container mx-auto max-w-6xl h-screen">
       <div className="flex justify-between items-center mb-8 mt-8">
         <h1 className="text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
         <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ const CreateChatbotPage = () => {
                   isLoading={isLoading}
                 />
               </div>
-              <div className="relative w-full h-full overflow-y-auto">
+              <div className="relative w-full h-full">
                 <FloatingDock
                   items={items}
                   selectedId={selectedId}

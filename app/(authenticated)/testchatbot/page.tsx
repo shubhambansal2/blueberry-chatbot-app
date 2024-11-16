@@ -15,9 +15,11 @@ import LoadingSkeletons from '../../../components/LoadingSkeletons';
 import ChatbotLoadingSkeleton from '../../../components/LoadingSkeletons';
 
 
-
 const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
   if (!selectedChatbot) return null;
+  const consumerName = 'Your Test Messages';
+  const consumerId = '3';
+  // const consumerName = localStorage.getItem('consumerName');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -26,6 +28,8 @@ const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | 
             chatbotId={selectedChatbot.chatbot_id.toString()}
             chatbotName={selectedChatbot.chatbot_name}
             apiKey="ABC"
+            consumerName={consumerName}
+            consumerId={consumerId}
           />
         <div className="absolute top-4 right-4">
           <button

@@ -5,12 +5,15 @@ import chatbotmaximize from './Chatbot_Maximize.mp3';
 import chatbotminimize from './Chatbot_Minimize.mp3';
 import { MessageCircle, X, Send } from 'lucide-react';
 import MessageFormatter from './MessageFormatter' 
+import axios from 'axios';
 
 interface ChatWidgetProps {
   chatbotId: string;
   chatbotName: string;
   apiKey: string;
   accentColor?: string;
+  consumerName?: string;
+  consumerId?: string;
 }
 
 interface Message {
@@ -32,6 +35,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   chatbotId, 
   chatbotName, 
   apiKey,
+  consumerName = `${['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Sam', 'Riley', 'Quinn', 'Avery', 'Parker'][Math.floor(Math.random() * 10)]} ${['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'][Math.floor(Math.random() * 10)]}`,
+  consumerId = Math.random().toString(36).substring(2, 8),
   accentColor = '#2563eb' // default to blue-600
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -53,6 +58,26 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   const generateSessionId = () => {
     return Math.random().toString(36).substring(2, 8);
   };
+
+  // useEffect(() => {
+  //   if (!consumerId) {
+  //     // Generate a random 6-character consumer ID if none provided
+  //     const randomId = Math.random().toString(36).substring(2, 8);
+  //     console.log('Generated random consumer ID:', randomId);
+  //   }
+  // }, [consumerId]);
+
+  // useEffect(() => {
+  //   if (!consumerName) {
+  //     // Generate a random consumer name if none provided
+  //     const firstNames = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Sam', 'Riley', 'Quinn', 'Avery', 'Parker', 'Blake', 'Charlie', 'Drew', 'Emerson', 'Frankie', 'Harper', 'Kennedy', 'London', 'Madison', 'Phoenix', 'Reagan', 'Sage', 'Sydney', 'Winter', 'Skylar', 'River', 'Robin', 'Storm', 'Tyler', 'Val'];
+  //     const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson'];
+  //     const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  //     const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  //     const randomName = `${randomFirstName} ${randomLastName}`;
+  //     console.log('Generated random consumer name:', randomName);
+  //   }
+  // }, [consumerName]);
 
   useEffect(() => {
     const initializeChatbot = async () => {
@@ -140,6 +165,12 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
           isTyping: true,
         } as Message;
         
+        const userId = localStorage.getItem('user');
+        if (!userId) {
+          console.error('User ID not found in localStorage');
+          return;
+        }
+        
         setMessages(prev => [...prev, botResponse]);
         scrollToBottom();
         
@@ -148,6 +179,21 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
         }
         
         typeWriterEffect(botMessageId, data.response || 'Bot did not provide a response');
+
+        await axios.post(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbot/${chatbotId}/${userId}/save_message_to_db/`, {
+            session_id: sessionId,
+            consumer_id: consumerId, // Assuming this is a constant value, adjust if needed
+            consumer_name: consumerName,
+            message: userInput,
+            bot_message: data.response
+          }, {
+            headers: { 'Content-Type': 'application/json' }
+          }).then(response => {
+            console.log('Message saved to database:', response.data);
+          }
+          ).catch(error => {
+            console.error('Error saving message to database:', error);
+          });
 
       } catch (error) {
         console.error('Failed to get bot response:', error);
@@ -309,7 +355,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
             
             {isFirstTimeOpen && (
               <div className="absolute bottom-20 right-0 bg-white text-gray-800 rounded-lg shadow-lg p-4 w-64 chat-widget-enter">
-                <p className="text-sm">👋 Hi there! Need help? I am here to assist you.</p>
+                <p className="text-sm">👋 Hi There, Need help? I am here to assist you.</p>
                 <div 
                   className="absolute -bottom-2 right-6 w-4 h-4 bg-white transform rotate-45"
                   style={{ clipPath: 'polygon(0 0, 100% 100%, 100% 0)' }}

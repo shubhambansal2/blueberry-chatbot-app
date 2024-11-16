@@ -24,6 +24,7 @@ const SignIn: NextPage = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [invalidcredentials, setInvalidcredentials] = useState<boolean>(false);
 
 
 
@@ -37,6 +38,7 @@ const SignIn: NextPage = () => {
       } else {
         setError('Invalid email or password');
         setIsLoading(false);
+        setInvalidcredentials(true);
       }
     } catch (error) {
       setError('An error occurred during sign in');
@@ -82,29 +84,50 @@ const SignIn: NextPage = () => {
           <h1 className="my-8 text-xl text-zinc-700 text-center">
             Signin to Blueberry AI
           </h1>
+          {invalidcredentials && (
+            <p className="mt-1 text-sm text-red-500">Invalid email or password, please try again</p>
+          )}
           <form onSubmit={handleSubmit}>
-            <input
-              type="email"
-              className=" w-full rounded-xl shadow-sm border border-gray-100 placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent mb-6"
-              placeholder="Email Address"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              className=" w-full rounded-xl shadow-sm border border-gray-100 placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent mb-6"
-              placeholder="Password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="mb-6">
+              <input
+                type="email"
+                className={`w-full rounded-xl shadow-sm border ${
+                  email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                    ? 'border-red-500'
+                    : 'border-gray-100'
+                } placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent`}
+                placeholder="Email Address"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && (
+                <p className="mt-1 text-sm text-red-500">Please enter a valid email address</p>
+              )}
+            </div>
+            <div className="mb-6">
+              <input
+                type="password"
+                className={`w-full rounded-xl shadow-sm border ${
+                  password && password.length < 8
+                    ? 'border-red-500'
+                    : 'border-gray-100'
+                } placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent`}
+                placeholder="Password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
             <Button
               type="submit"
               as="button"
               variant="large"
               className="rounded-2xl py-2 w-full"
               onClick={handleSubmit}
+              disabled={!email || !password || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 8}
             >
               Sign In
             </Button>
@@ -112,7 +135,7 @@ const SignIn: NextPage = () => {
 
           <div className="flex flex-row space-x-1 items-center mt-4">
             <div className="h-px w-1/2 bg-gray-200" />
-            <span className="text-xs text-gray-500">or</span>
+            <span className="text-xs text-gray-500">OR</span>
             <div className="h-px w-1/2 bg-gray-200" />
           </div>
 
