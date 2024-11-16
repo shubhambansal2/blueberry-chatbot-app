@@ -184,7 +184,7 @@ const ChatbotMessagesPage = () => {
       console.log("userId:", userId);
 
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/users/get_all_consumers/${chatbotId}/${userId}/`
+        `https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/get_all_consumers/${chatbotId}/${userId}/`
       );
       
       console.log("API Response:", response.data);
