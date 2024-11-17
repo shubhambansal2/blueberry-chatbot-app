@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { cn } from "../lib/utils";
 import Link, { LinkProps } from "next/link";
-import React, { useState, createContext, useContext, useEffect } from "react";
+import React, { useState, createContext, useContext, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Logo from "./Logo";
 import {
@@ -32,6 +32,7 @@ import {
   IconInboxOff,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
+import { debounce } from "lodash";
 
 
 
@@ -125,7 +126,31 @@ export function SidebarLayout({
             <div className="absolute bottom-0 left-4 right-0 bg-inherit pb-4">
               <SidebarLink
                 link={{
-                  label: "Shubham Bansal",
+                  label: (() => {
+                    const [userEmail, setUserEmail] = useState("User");
+                    
+                    useEffect(() => {
+                      const fetchUserDetails = async () => {
+                        try {
+                          const accessToken = localStorage.getItem('accessToken');
+                          const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/test-auth/', {
+                            headers: {
+                              'Authorization': `Bearer ${accessToken}`
+                            }
+                          });
+                          const data = await response.json();
+                          if (data.email) {
+                            setUserEmail(data.email);
+                          }
+                        } catch (error) {
+                          console.error('Error fetching user details:', error);
+                        }
+                      };
+                      fetchUserDetails();
+                    }, []);
+
+                    return userEmail;
+                  })(),
                   href: "#",
                   icon: <IconUserBolt className="h-5 w-5 flex-shrink-0 text-neutral-700" />
                 }}
@@ -233,6 +258,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
     </>
   );
 };
+
 export const DesktopSidebar = ({
   className,
   children,
@@ -240,27 +266,48 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen } = useSidebar();
 
+  const debouncedOpen = useCallback(
+    debounce((value: boolean) => {
+      setOpen(value);
+    }, 500), // 500ms delay before opening
+    []
+  );
+
+  // Clear the debounce timer when mouse leaves immediately
+  const handleMouseLeave = () => {
+    debouncedOpen.cancel();
+    setOpen(false);
+  };
+
   return (
     <motion.div
       className={cn(
         "group/sidebar relative hidden h-full flex-shrink-0 rounded-xl px-4 py-4 bg-slate-150 md:flex md:flex-col",
-        "border-r border-gray-200 shadow-lg", // Added border and shadow
+        "border-r border-gray-200 shadow-lg",
         className
       )}
-      onMouseEnter={() => setOpen(true)} // Expand on hover
-      onMouseLeave={() => setOpen(false)} // Collapse when hover ends
+      onMouseEnter={() => debouncedOpen(true)}
+      onMouseLeave={handleMouseLeave}
       animate={{
         width: open ? "300px" : "70px",
       }}
+      transition={{
+        duration: 0.8, // Slower width animation
+        ease: [0.4, 0, 0.2, 1] // Smooth easing function
+      }}
       {...props}
     >
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {open && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="transition-opacity duration-500 ease-in-out"
+            transition={{
+              duration: 0.6, // Slower opacity animation
+              ease: "easeInOut"
+            }}
+            className="w-full"
           >
             {children}
           </motion.div>
@@ -270,7 +317,11 @@ export const DesktopSidebar = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="transition-opacity duration-500 ease-in-out"
+            transition={{
+              duration: 0.6, // Slower opacity animation
+              ease: "easeInOut"
+            }}
+            className="w-full"
           >
             {children}
           </motion.div>
@@ -388,9 +439,6 @@ export const MobileSidebar = ({
     </motion.div>
   );
 };
-
-
-
 
   // export function CollapsibleSidebar() {
   //   return (

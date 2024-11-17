@@ -52,7 +52,7 @@ interface Deployment {
   customScripts?: FileData[];
 }
 
-interface ChatbotState {
+export type ChatbotState = {
   companyDetails: CompanyDetails;
   chatbotDetails: ChatbotDetails;
   specialInstructions: SpecialInstructions;
@@ -69,7 +69,7 @@ interface ChatbotState {
   updateDeployment: (deployment: Partial<Deployment>) => void;
   resetForm: () => void;
   resetChatbotDetails: () => void;
-}
+};
 
 const initialState = {
   companyDetails: {

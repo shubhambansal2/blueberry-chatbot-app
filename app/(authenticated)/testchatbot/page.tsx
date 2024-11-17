@@ -10,9 +10,10 @@ import GradientCard from '../../../components/GradientChatbotCard';
 import DeleteDialogue from '../../../components/DeleteDialogue';
 import GlobalLoadingOverlay from '../../../components/GlobalLoadingOverlay';
 import ChatWidget from '../../../components/Chatbot_New';
-import Templates from '../../../components/Templates';
 import LoadingSkeletons from '../../../components/LoadingSkeletons';
 import ChatbotLoadingSkeleton from '../../../components/LoadingSkeletons';
+import TemplateCardShowcase from '../../../components/TemplateCardShowcase';
+
 
 
 const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
@@ -155,7 +156,7 @@ const Testchatbotpage = () => {
         {isDeleting && <GlobalLoadingOverlay message="Deleting chatbot..." />}
         <div className="flex flex-col">
           <h2 className="text-2xl font-semibold text-gray-800 mt-20">Start with Templates</h2>
-        <Templates />
+        <TemplateCardShowcase />
         </div>
       </div>
       

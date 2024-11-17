@@ -4,7 +4,7 @@
 import Testchatbotpage from './testchatbot/page';
 import { StrictMode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
-import Templates from '../../components/Templates';
+import Templates from '../../components/TemplateCardShowcase';
 
 export default function Home() {
   return (

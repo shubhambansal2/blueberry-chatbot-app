@@ -91,9 +91,10 @@ const CreateChatbotPage = () => {
   ];
 
   const CurrentForm = selectedId ? formComponents[selectedId] : null;
+  const router = useRouter();
 
   return (
-    <div className="container mx-auto max-w-6xl h-screen">
+    <div className="container mx-auto max-w-6xl min-h-screen">
       <div className="flex justify-between items-center mb-8 mt-8">
         <h1 className="text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
         <div className="flex items-center gap-2">
@@ -101,12 +102,22 @@ const CreateChatbotPage = () => {
           <Link href="/testchatbot" className="px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition-colors">
             My Chatbots
           </Link>
+          <button
+            onClick={() => {
+              useChatbotStore.getState().resetForm();
+              console.log("Form reset");
+              window.location.reload();
+            }}
+            className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-600 transition-colors"
+          >
+            Clear Form
+          </button>
         </div>
       </div>
       <div className="relative">
         <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px]">
-          <div className="absolute inset-[0.5px] rounded-2xl bg-white">
-            <div className="w-full h-full p-8 overflow-hidden">
+          <div className="absolute inset-[0.5px] rounded-2xl bg-white overflow-hidden">
+            <div className="w-full h-full p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               <div className="absolute top-4 right-4 z-50">
                 <ActivationDialog 
                   isValid={isValid}
@@ -132,5 +143,6 @@ const CreateChatbotPage = () => {
     </div>
   );
 };
+
 
 export default CreateChatbotPage;
