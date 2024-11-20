@@ -6,6 +6,7 @@ export interface Chatbot {
   company_name: string;
   role: string;
   personality: string;
+  api_key: string;
 }
 
 export const fetchChatbots = async (): Promise<Chatbot[]> => {

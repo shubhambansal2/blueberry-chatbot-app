@@ -119,10 +119,12 @@ const CreateChatbotPage = () => {
           <div className="absolute inset-[0.5px] rounded-2xl bg-white overflow-hidden">
             <div className="w-full h-full p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               <div className="absolute top-4 right-4 z-50">
-                <ActivationDialog 
-                  isValid={isValid}
-                  isLoading={isLoading}
-                />
+                {selectedId !== "activation" && (
+                  <ActivationDialog 
+                    isValid={isValid}
+                    isLoading={isLoading}
+                  />
+                )}
               </div>
               <div className="relative w-full h-full">
                 <FloatingDock

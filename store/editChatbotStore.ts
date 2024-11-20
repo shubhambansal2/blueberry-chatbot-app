@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 export type FileData = {
   file: File | null;
   preview: string;
+  source_id?: string;
 };
 
 interface CompanyDetails {
@@ -11,7 +12,7 @@ interface CompanyDetails {
   industry: string;
   companyDetails?: string;
   logo?: FileData | null;
-}
+} 
 
 interface ChatbotColor {
   id: string;
@@ -34,8 +35,8 @@ interface SpecialInstructions {
 }
 
 interface DataSources {
-  websites: Array<{ value: string }>;  // Updated to match FieldArray requirements
-  documents: FileData[];
+  websites: Array<{ value: string, source_id?: string }>;  // Updated to match FieldArray requirements
+  documents: Array<FileData >;
 }
 
 interface Activation {
@@ -92,8 +93,8 @@ const initialState = {
     exampleresponses: [],
   },
   dataSources: {
-    websites: [{ value: '' }], // Updated initial state to match new type
-    documents: [],
+    websites: [{ value: '', source_id: undefined }], // Initial state with optional source_id
+    documents: [], // Array of FileData with optional source_id
   },
   activation: {
     isActive: false,

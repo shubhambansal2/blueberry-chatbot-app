@@ -80,7 +80,9 @@ const SignIn: NextPage = () => {
           />
         </div>
         <div className="px-10 py-20 rounded-xl bg-white shadow-lg w-[30rem] mt-40 md:mt-40 mx-4 relative z-10">
-          <Logo textClassName="text-zinc-700" />
+          <div className="flex flex-col items-center justify-center">
+            <Logo textClassName="items-center justify-center text-zinc-700" />
+          </div>
           <h1 className="my-8 text-xl text-zinc-700 text-center">
             Signin to Blueberry AI
           </h1>

@@ -61,9 +61,9 @@ export const coffeeShopTemplate: Partial<ChatbotState> = {
   },
   dataSources: {
     websites: [
-      { value: 'https://beanandbrew.com/menu' },
-      { value: 'https://beanandbrew.com/coffee-guide' },
-      { value: 'https://beanandbrew.com/brewing-tips' }
+      // { value: 'https://beanandbrew.com/menu' },
+      // { value: 'https://beanandbrew.com/coffee-guide' },
+      // { value: 'https://beanandbrew.com/brewing-tips' }
     ],
     documents: []
   },
@@ -115,9 +115,9 @@ export const travelTemplate: Partial<ChatbotState> = {
   },
   dataSources: {
     websites: [
-      { value: 'https://wanderlustadventures.com/destinations' },
-      { value: 'https://wanderlustadventures.com/travel-guides' },
-      { value: 'https://wanderlustadventures.com/booking-help' }
+      // { value: 'https://wanderlustadventures.com/destinations' },
+      // { value: 'https://wanderlustadventures.com/travel-guides' },
+      // { value: 'https://wanderlustadventures.com/booking-help' }
     ],
     documents: []
   },
@@ -169,9 +169,9 @@ export const hospitalTemplate: Partial<ChatbotState> = {
   },
   dataSources: {
     websites: [
-      { value: 'https://healthcareplus.com/services' },
-      { value: 'https://healthcareplus.com/patient-info' },
-      { value: 'https://healthcareplus.com/departments' }
+      // { value: 'https://healthcareplus.com/services' },
+      // { value: 'https://healthcareplus.com/patient-info' },
+      // { value: 'https://healthcareplus.com/departments' }
     ],
     documents: []
   },
@@ -223,9 +223,9 @@ export const insuranceTemplate: Partial<ChatbotState> = {
   },
   dataSources: {
     websites: [
-      { value: 'https://securelife.com/policies' },
-      { value: 'https://securelife.com/claims' },
-      { value: 'https://securelife.com/coverage-guide' }
+      // { value: 'https://securelife.com/policies' },
+      // { value: 'https://securelife.com/claims' },
+      // { value: 'https://securelife.com/coverage-guide' }
     ],
     documents: []
   },
