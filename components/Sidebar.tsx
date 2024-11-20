@@ -34,7 +34,32 @@ import {
 import { usePathname } from "next/navigation";
 import { debounce } from "lodash";
 
+// Move the user email logic to a separate component
+const UserEmailDisplay = () => {
+  const [userEmail, setUserEmail] = useState("User");
+  
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/test-auth/', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+        const data = await response.json();
+        if (data.email) {
+          setUserEmail(data.email);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+    fetchUserDetails();
+  }, []);
 
+  return userEmail;
+};
 
 export function SidebarLayout({
   className,
@@ -80,13 +105,6 @@ export function SidebarLayout({
       ),
     },
     {
-      label: "Resources",
-      href: "#",
-      icon: (
-        <IconNotebook className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-      ),
-    },
-    {
       label: "Integrations (Coming Soon)",
       href: "#",
       icon: (
@@ -126,31 +144,7 @@ export function SidebarLayout({
             <div className="absolute bottom-0 left-4 right-0 bg-inherit pb-4">
               <SidebarLink
                 link={{
-                  label: (() => {
-                    const [userEmail, setUserEmail] = useState("User");
-                    
-                    useEffect(() => {
-                      const fetchUserDetails = async () => {
-                        try {
-                          const accessToken = localStorage.getItem('accessToken');
-                          const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/test-auth/', {
-                            headers: {
-                              'Authorization': `Bearer ${accessToken}`
-                            }
-                          });
-                          const data = await response.json();
-                          if (data.email) {
-                            setUserEmail(data.email);
-                          }
-                        } catch (error) {
-                          console.error('Error fetching user details:', error);
-                        }
-                      };
-                      fetchUserDetails();
-                    }, []);
-
-                    return userEmail;
-                  })(),
+                  label: <UserEmailDisplay />,
                   href: "#",
                   icon: <IconUserBolt className="h-5 w-5 flex-shrink-0 text-neutral-700" />
                 }}
@@ -177,7 +171,7 @@ export function SidebarLayout({
 
 
 interface Links {
-  label: string;
+  label: string | React.ReactNode;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
 }
@@ -265,17 +259,25 @@ export const DesktopSidebar = ({
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen } = useSidebar();
+  const [isHovered, setIsHovered] = useState(false);
 
   const debouncedOpen = useCallback(
     debounce((value: boolean) => {
       setOpen(value);
-    }, 500), // 500ms delay before opening
-    []
+    }, 500),
+    [setOpen]
   );
+
+  useEffect(() => {
+    if (isHovered) {
+      debouncedOpen(true);
+    }
+  }, [isHovered, debouncedOpen]);
 
   // Clear the debounce timer when mouse leaves immediately
   const handleMouseLeave = () => {
     debouncedOpen.cancel();
+    setIsHovered(false);
     setOpen(false);
   };
 
@@ -286,7 +288,7 @@ export const DesktopSidebar = ({
         "border-r border-gray-200 shadow-lg",
         className
       )}
-      onMouseEnter={() => debouncedOpen(true)}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       animate={{
         width: open ? "300px" : "70px",

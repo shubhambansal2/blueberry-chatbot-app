@@ -7,7 +7,7 @@ import { usePathname, useParams, useRouter } from 'next/navigation';
 import { editChatbotStore } from '../../../../store/editChatbotStore';
 import ActivationDialog from '@components/ActivationDialogue';
 import { CompanyDetailsForm } from '@components/edit forms/CompanyDetailsForm';
-import { DataSourcesForm } from '@components/edit forms/DataSourcesForm';
+import { DataSourcesForm, FileData } from '@components/edit forms/DataSourcesForm';
 import { ChatbotDetailsForm } from '@components/edit forms/ChatbotDetailsForm';
 import { SpecialInstructionsForm } from '@components/edit forms/SpecialInstructionsForm';
 import ActivationForm from '@components/edit forms/ActivationForm';
@@ -23,25 +23,61 @@ import {
   IconChecks,
 } from "@tabler/icons-react";
 
+// Define the type for data source
+type DataSource = {
+  title: string;
+  url: string;
+  source_id?: string;
+  id?: string;
+  // Add other properties if needed
+};
+
+interface DataSources {
+  websites: Array<{ value: string, source_id?: string }>;  // Updated to match FieldArray requirements
+  documents: FileData[];
+}
+const fetchDataSources = async (id: string) => {
+  // Make API call to get data sources
+  const response = await fetch(`http://127.0.0.1:8000/api/users/get_data_sources/${id}/`, {
+  });
+  return response.json();
+}
+
 // Mock API call to fetch chatbot data
 const fetchChatbotData = async (id: string) => {
-//   await new Promise(resolve => setTimeout(resolve, 1000));
-  // Make API call to get chatbot data
   const token = localStorage.getItem('accessToken');
   const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${id}/`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     }
   });
+
+  const dataSources = await fetchDataSources(id);
+  const pdfs = dataSources.data_sources.filter((source: DataSource) => source.title.endsWith('.pdf'));  
+  const urls = dataSources.data_sources.filter((source: DataSource) => source.title.startsWith('http') || source.title.startsWith('www'));
+
+  const pdffile = await Promise.all(pdfs.map(async (pdf: DataSource) => {
+    const pdfUrl = pdf.url;
+    const response = await fetch(pdfUrl);
+    const blob = await response.blob();
+    return {
+      url: pdfUrl,
+      data: blob,
+      id: pdf.id  // Store the source_id from the PDF
+    };
+  }));
+
+  dataSources.data_sources = [...urls, ...pdffile];
+  console.log(urls);
+  console.log(pdffile);
   
   const chatbotData = await response.json();
-  console.log("Fetched chatbot data:", chatbotData);
   
   return {
     companyDetails: {
       companyName: chatbotData.company_name,
-      industry: '',
-      companyDetails: '',
+      industry: chatbotData.company_industry,
+      companyDetails: chatbotData.company_details,
       logo: null,
     },
     chatbotDetails: {
@@ -53,27 +89,20 @@ const fetchChatbotData = async (id: string) => {
       avatar: null,
     },
     specialInstructions: {
-      specialinstructions: '',
-      exampleresponses: [],
+      specialinstructions: chatbotData.special_instructions,
+      exampleresponses: chatbotData.question_answer_pairs,
     },
     dataSources: {
-      websites: [],
-      documents: [],
-      isRagEnabled: chatbotData.is_rag_enabled,
-      ragSource: chatbotData.rag_source
-    },
-    activation: {
-      isActive: true,
-      startDate: '',
-      endDate: '',
-      allowedDomains: [],
-    },
-    deployment: {
-      platform: 'web',
-      configuration: {},
-      customCSS: '',
-      customScripts: [],
-    },
+      websites: urls.map((url: DataSource) => ({ 
+        value: url.title,
+        source_id: url.id  // Store the source_id from the URL
+      })),
+      documents: pdffile.map(pdf => ({
+        file: new File([pdf.data], pdf.url.split('/').pop() || 'document.pdf', { type: 'application/pdf' }),
+        preview: pdf.url,
+        source_id: pdf.id  // Include the source_id in documents
+      }))
+    }
   };
 };
 
@@ -200,8 +229,7 @@ const EditChatbotPage = () => {
         updateChatbotDetails(data.chatbotDetails);
         updateSpecialInstructions(data.specialInstructions);
         updateDataSources(data.dataSources);
-        updateActivation(data.activation);
-        updateDeployment(data.deployment);
+  
 
         setIsLoading(false);
       } catch (err) {
@@ -260,6 +288,13 @@ const EditChatbotPage = () => {
       href: "#activation",
     }
   ];
+  const chatbotDetails = editChatbotStore((state) => state.chatbotDetails);
+
+  const isValid = Boolean(
+    chatbotDetails.name && 
+    chatbotDetails.personality && 
+    chatbotDetails.description
+  );
   
   
 
@@ -291,10 +326,12 @@ const EditChatbotPage = () => {
           <div className="absolute inset-[0.5px] rounded-2xl bg-white">
             <div className="w-full h-full p-8 overflow-hidden">
               <div className="absolute top-4 right-4 z-50">
-                <ActivationDialogue_Edit 
-                  isValid={true}
-                  isLoading={isSaving}
-                />
+                {selectedId !== 'activation' && (
+                  <ActivationDialogue_Edit 
+                    isValid={isValid}
+                    isLoading={isSaving}
+                  />
+                )}
               </div>
               <div className="relative w-full h-full overflow-y-auto">
                 <FloatingDock

@@ -312,13 +312,13 @@ const PlatformIntegration = () => {
     return `<div id="chat-widget-container"></div>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/shubhambansal2/chatbotintegration/chatbot.bundle_v5.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/shubhambansal2/chatbotintegration/chatbot.bundle_v9.js"></script>
 <script>
     // Initialize with configuration
     window.ChatWidget.render('chat-widget-container', {
         chatbotId: '${selectedChatbot.chatbot_id}',
         chatbotName: '${selectedChatbot.chatbot_name}',
-        apiKey: 'ABC123alkdfhjkadjf'
+        apiKey: '${selectedChatbot.api_key}'
     });
 </script>`;
   };

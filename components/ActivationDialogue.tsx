@@ -24,7 +24,7 @@ type ActivationDialogProps = {
 const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDialogProps) => {
   const [isActivating, setIsActivating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { chatbotDetails, companyDetails, resetChatbotDetails } = useChatbotStore();
+  const { chatbotDetails, companyDetails, specialInstructions, resetChatbotDetails } = useChatbotStore();
   const router = useRouter();
 
   const handleActivation = async () => {
@@ -42,10 +42,14 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
         },
         body: JSON.stringify({
           chatbot_name: chatbotDetails.name,
-          company_name: companyDetails.companyName || "Null",
-          role: chatbotDetails.description,
-          personality: chatbotDetails.personality,
-          user: user
+          company_name: companyDetails.companyName,
+          company_industry: companyDetails.industry || "",
+          company_details: companyDetails.companyDetails || "",
+          special_instructions: specialInstructions.specialinstructions || "",
+          question_answer_pairs: specialInstructions.exampleresponses || [],
+          role: chatbotDetails.description || "",
+          personality: chatbotDetails.personality || "",
+          user: user,
         })
       });
 

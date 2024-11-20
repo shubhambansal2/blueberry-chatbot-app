@@ -6,14 +6,14 @@ import { editChatbotStore } from '../../store/editChatbotStore';
 export type FileData = {
   file: File | null;
   preview: string;
+  source_id?: string;
 };
 
 interface DataSourcesInputs {
-  websites: Array<{ value: string }>;
+  websites: Array<{ value: string, source_id?: string }>;
 }
 
 export const DataSourcesForm = () => {
-  // Get store data and update function separately
   const dataSources = editChatbotStore(state => state.dataSources);
   const updateDataSources = editChatbotStore(state => state.updateDataSources);  
 
@@ -28,7 +28,6 @@ export const DataSourcesForm = () => {
     name: 'websites'
   });
 
-  // Watch for changes in the websites field and update the store
   const websites = watch('websites');
   React.useEffect(() => {
     updateDataSources({
@@ -62,12 +61,44 @@ export const DataSourcesForm = () => {
     });
   };
 
-  const handleRemoveDocument = (index: number) => {
+  const handleRemoveDocument = async (index: number) => {
+    // Log the source_id before removing the document
+    const documentToRemove = dataSources.documents?.[index];
+    console.log(documentToRemove);
+    if (documentToRemove?.source_id) {
+      console.log('Deleting document with source_id:', documentToRemove.source_id);
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/delete-pdf/${documentToRemove.source_id}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response);
+    }
+
     const updatedDocuments = (dataSources.documents || []).filter((_, i) => i !== index);
     updateDataSources({
       ...dataSources,
       documents: updatedDocuments
     });
+  };
+
+  const handleRemoveWebsite = async (index: number) => {
+    // Log the source_id before removing the website
+    const websiteToRemove = websites[index];
+    console.log(websiteToRemove);
+    if (websiteToRemove?.source_id) {
+      console.log('Deleting website with source_id:', websiteToRemove.source_id);
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/delete-url/${websiteToRemove.source_id}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response);
+    }
+    
+    remove(index);
   };
 
   return (
@@ -100,15 +131,13 @@ export const DataSourcesForm = () => {
                   />
                 </div>
               </div>
-              {fields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className="text-red-500 hover:text-red-600 transition-colors p-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => handleRemoveWebsite(index)}
+                className="text-red-500 hover:text-red-600 transition-colors p-2"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           ))}
         </div>
