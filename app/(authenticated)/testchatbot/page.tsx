@@ -32,7 +32,13 @@ const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | 
             consumerName={consumerName}
             consumerId={consumerId}
           />
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex gap-2">
+          <button
+            onClick={() => window.location.href = '/deploychatbot'}
+            className="bg-blue-80 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+          >
+            Deploy
+          </button>
           <button
             onClick={onClose}
             className="bg-red-800 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors"
@@ -122,7 +128,7 @@ const Testchatbotpage = () => {
         
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Chatbots</h2>
           <div className="flex flex-row items-center space-x-6 overflow-x-auto pb-4 mt-8">
-          {!isLoadingChatbots && <GradientButton />}
+          {!isLoadingChatbots && <div className="hidden lg:block"><GradientButton /></div>}
             <div className="flex flex-wrap gap-8">
             {isLoadingChatbots ? (
               // Show loading skeletons while loading

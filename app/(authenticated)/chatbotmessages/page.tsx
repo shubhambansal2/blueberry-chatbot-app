@@ -5,11 +5,7 @@ import { useParams } from 'next/navigation'; // For accessing dynamic route para
 import { Menu, MessageCircle, User, X } from 'lucide-react';
 import axios from 'axios';
 import { Chatbot, fetchChatbots } from '../../../lib/chatbotsfetch';
-import { FiX, FiMenu } from 'react-icons/fi';
-
-import { ScrollArea } from "../../../components/ui/ScrollArea"
 import { Button } from "../../../components/ui/Button";
-import { Card, CardHeader, CardContent } from "../../../components/ui/Card";
 import { Bot, Users } from 'lucide-react';
 import ChatSkeleton from '../../../components/Chatskeleton';
 
@@ -130,8 +126,6 @@ interface Message {
     </div>
   );
 };
-
-  
   
 const ChatbotMessagesPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -323,37 +317,45 @@ const ChatbotMessagesPage = () => {
         {/* Messages container */}
         <div className="flex-1 overflow-y-auto bg-white">
           {isMessagesLoading ? <ChatSkeleton /> : (
-            <div className="p-4">
-              {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex items-start space-x-2 mb-4 ${
-                  message.sender === 'User' ? 'justify-start' : 'justify-end'
-                }`}
-              >
-                {message.sender === 'User' && (
-                  <div className="flex-shrink-0">
-                    <User className="h-8 w-8 text-gray-600" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[70%] p-3 rounded-lg ${
-                    message.sender === 'User'
-                      ? 'bg-blue-100 text-blue-900'
-                      : 'bg-gray-100 text-gray-900'
-                  }`}
-                >
-                  <p className="text-sm font-medium mb-1">{message.sender}</p>
-                  <p className="text-sm">{message.content}</p>
+            <div className="p-4 mt-80">
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <p className="text-gray-500 text-3xl font-bold">No Conversations Yet</p>
                 </div>
-                {message.sender !== 'User' && (
-                  <div className="flex-shrink-0">
-                    <MessageCircle className="h-8 w-8 text-blue-600" />
-                  </div>
-                )}
-              </div>
-            ))}
-              <div ref={messagesEndRef} />
+              ) : (
+                <>
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex items-start space-x-2 mb-4 ${
+                        message.sender === 'User' ? 'justify-start' : 'justify-end'
+                      }`}
+                    >
+                      {message.sender === 'User' && (
+                        <div className="flex-shrink-0">
+                          <User className="h-8 w-8 text-gray-600" />
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[70%] p-3 rounded-lg ${
+                          message.sender === 'User'
+                            ? 'bg-blue-100 text-blue-900'
+                            : 'bg-gray-100 text-gray-900'
+                        }`}
+                      >
+                        <p className="text-sm font-medium mb-1">{message.sender}</p>
+                        <p className="text-sm">{message.content}</p>
+                      </div>
+                      {message.sender !== 'User' && (
+                        <div className="flex-shrink-0">
+                          <MessageCircle className="h-8 w-8 text-blue-600" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
           )}
         </div>
