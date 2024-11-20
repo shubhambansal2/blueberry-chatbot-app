@@ -15,6 +15,9 @@ import {
 } from "./ui/alert-dialog"
 import { editChatbotStore } from '../store/editChatbotStore';
 
+type URLType = string | { value: string; source_id?: string };
+type DocumentType = File & { source_id?: string };
+
 type ActivationDialogProps = {
   isValid: boolean;
   isLoading: boolean;
@@ -23,12 +26,93 @@ type ActivationDialogProps = {
 const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDialogProps) => {
   const [isActivating, setIsActivating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { chatbotDetails, companyDetails, specialInstructions, resetChatbotDetails } = editChatbotStore();
   const router = useRouter();
+
+  const {
+    chatbotDetails,
+    companyDetails,
+    specialInstructions,
+    dataSources,
+    resetForm
+  } = editChatbotStore(); 
 
   const handleActivation = async () => {
     setIsActivating(true);
     setIsOpen(false);
+
+    console.log('Full Data Sources:', dataSources);
+  console.log('Websites array:', dataSources?.websites);
+
+  const uploadDocuments = async (chatbot_id: string, documents: DocumentType[], urls: URLType[]) => {
+    console.log('Uploading documents for chatbot:', chatbot_id);
+    console.log('Documents:', documents);
+    
+    // Create FormData for each document
+    const formData = new FormData();
+    
+    // Upload each document that doesn't have a source_id
+    for (const document of documents) {
+      // Skip if document already has a source_id (meaning it's already uploaded)
+      if ((document as DocumentType).source_id) {
+        console.log(`Skipping document ${document.name} as it already has a source_id`);
+        continue;
+      }
+
+      formData.append('pdf_file', document);
+      formData.append('title', document.name);
+      formData.append('chatbot_id', chatbot_id);
+
+      console.log(formData);
+
+      try {
+        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/pdfupload/', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload document ${document.name}`);
+        }
+
+        const result = await response.json();
+        console.log(`Successfully uploaded document ${document.name}:`, result);
+      } catch (error) {
+        console.error(`Error uploading document ${document.name}:`, error);
+      }
+    }
+
+    console.log('URLs:', urls);
+    // Upload each URL that doesn't have a source_id
+    for (const url of urls) {
+      // Skip if URL already has a source_id
+      if (typeof url === 'object' && url.source_id) {
+        console.log(`Skipping URL ${url.value} as it already has a source_id`);
+        continue;
+      }
+
+      const urlFormData = new FormData();
+      const urlValue = typeof url === 'string' ? url : url.value;
+      urlFormData.append('url', urlValue);
+      urlFormData.append('chatbot_id', chatbot_id);
+      urlFormData.append('title', urlValue);
+
+      try {
+        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/upload-url/', {
+          method: 'POST',
+          body: urlFormData
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload URL ${urlValue}`);
+        }
+
+        const result = await response.json();
+        console.log(`Successfully uploaded URL ${urlValue}:`, result);
+      } catch (error) {
+        console.error(`Error uploading URL ${urlValue}:`, error);
+      }
+    }
+  }
     
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -56,8 +140,31 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
       if (!response.ok) {
         throw new Error('Failed to create chatbot');
       }
+
+      const files = dataSources?.documents
+                    ?.map(d => {
+                      if (d.file) {
+                        // Create a new File object with the same properties and add source_id
+                        const file = new File([d.file], d.file.name, {
+                          type: d.file.type,
+                          lastModified: d.file.lastModified
+                        });
+                        Object.defineProperty(file, 'source_id', {
+                          value: d.source_id,
+                          enumerable: true
+                        });
+                        return file;
+                      }
+                      return null;
+                    })
+                    .filter((file): file is (File & { source_id: string | undefined }) => file !== null) ?? [];
+      const websiteUrls = dataSources?.websites?.map(site => typeof site === 'string' ? site : site) ?? [];
       
-      resetChatbotDetails();
+      if (chatbot_id) {
+        await uploadDocuments(chatbot_id, files, websiteUrls);
+      }
+      
+      resetForm();
       router.push('/testchatbot');
     } catch (error) {
       console.error('Error activating chatbot:', error);

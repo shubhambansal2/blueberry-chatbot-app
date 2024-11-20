@@ -24,8 +24,73 @@ type ActivationDialogProps = {
 const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDialogProps) => {
   const [isActivating, setIsActivating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { chatbotDetails, companyDetails, specialInstructions, resetChatbotDetails } = useChatbotStore();
   const router = useRouter();
+
+  const {
+    chatbotDetails,
+    companyDetails,
+    specialInstructions,
+    dataSources,
+    resetForm
+  } = useChatbotStore();
+
+  // Debug logs
+  console.log('Full Data Sources:', dataSources);
+  console.log('Websites array:', dataSources?.websites);
+
+  const uploadDocuments = async (chatbotId: string, documents: File[], urls: string[]) => {
+    console.log('Uploading documents for chatbot:', chatbotId);
+    console.log('Documents:', documents);
+    // Create FormData for each document
+    const formData = new FormData();
+    
+    // Upload each document
+    for (const document of documents) {
+      formData.append('pdf_file', document);
+      formData.append('title', document.name);
+      formData.append('chatbot_id', chatbotId);
+
+      try {
+        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/pdfupload/', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload document ${document.name}`);
+        }
+
+        const result = await response.json();
+        console.log(`Successfully uploaded document ${document.name}:`, result);
+      } catch (error) {
+        console.error(`Error uploading document ${document.name}:`, error);
+      }
+    }
+    console.log('URLs:', urls);
+    // Upload each URL
+    for (const url of urls) {
+      const urlFormData = new FormData();
+      urlFormData.append('url', url);
+      urlFormData.append('chatbot_id', chatbotId);
+      urlFormData.append('title', url);
+
+      try {
+        const response = await fetch('https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/upload-url/', {
+          method: 'POST',
+          body: urlFormData
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload URL ${url}`);
+        }
+
+        const result = await response.json();
+        console.log(`Successfully uploaded URL ${url}:`, result);
+      } catch (error) {
+        console.error(`Error uploading URL ${url}:`, error);
+      }
+    }
+  }
 
   const handleActivation = async () => {
     setIsActivating(true);
@@ -56,8 +121,16 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
       if (!response.ok) {
         throw new Error('Failed to create chatbot');
       }
+      const data = await response.json();
+      console.log('Chatbot created successfully:', data);
+      const chatbotId = data.chatbot_id;
+      console.log('New chatbot ID:', chatbotId);
       
-      resetChatbotDetails();
+      const files = dataSources?.documents?.map(d => d.file).filter((file): file is File => file !== null) ?? [];
+      const websiteUrls = dataSources?.websites?.map(site => typeof site === 'string' ? site : site.value) ?? [];
+      await uploadDocuments(chatbotId, files, websiteUrls);
+      
+      resetForm();
       router.push('/testchatbot');
     } catch (error) {
       console.error('Error activating chatbot:', error);
