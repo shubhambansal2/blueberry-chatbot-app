@@ -12,9 +12,9 @@ export default function Home() {
   <div className="flex flex-col gap-10">
   <Card className="bg-quinary shadow-lg ml-8 mt-10">
     <CardContent className="p-6">
-      <h1 className="text-3xl font-bold mb-2">Welcome to Blueberry AI 👋</h1>
+      <h1 className="text-3xl font-bold mb-2">Welcome to Purpleberry AI 👋</h1>
       <p className="text-gray-600">
-        Welcome to Blueberry AI, start building your chatbot with powerful technology. Get ready to revolutionize your customer interactions!
+        Welcome to Purpleberry AI, start building your chatbot with powerful technology. Get ready to revolutionize your customer interactions!
       </p>
       <button className="mt-4 bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800">
         Learn How to Build and Deploy Chatbots in Minutes

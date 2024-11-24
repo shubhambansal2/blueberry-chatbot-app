@@ -93,7 +93,7 @@ const SignIn: NextPage = () => {
             <Logo textClassName="items-center justify-center text-zinc-700" />
           </div>
           <h1 className="my-8 text-xl text-zinc-700 text-center">
-            Signin to Blueberry AI
+            Signin to Purpleberry AI
           </h1>
           {invalidcredentials && (
             <p className="mt-1 text-sm text-red-500">Invalid email or password, please try again</p>

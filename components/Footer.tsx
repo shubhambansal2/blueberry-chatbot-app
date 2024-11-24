@@ -51,7 +51,7 @@ export const Footer = () => {
           ))}
         </div>
         <p className="text-slate-500 text-sm font-light text-center mt-8 border-t border-zinc-100 pt-4">
-          © {new Date().getFullYear()} Blueberry AI. All rights
+          © {new Date().getFullYear()} Purpleberry AI. All rights
           reserved.
         </p>
         <div className="flex flex-row justify-center space-x-2 mt-2">
