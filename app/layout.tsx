@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Blueberry | LLM Powered Chatbots",
+  title: "Purpleberry AI | LLM Powered Chatbots",
   description: "Harness the power of LLMs to build chatbots for your business",
 };
 

@@ -70,7 +70,7 @@ const Logo = ({
           }}
           className={twMerge("font-mono whitespace-nowrap", textClassName)}
         >
-          Blueberry AI
+          Purpleberry AI
         </motion.span>
       </motion.div>
     </Link>
