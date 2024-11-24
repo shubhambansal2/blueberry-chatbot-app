@@ -101,7 +101,7 @@ const SignUp = () => {
           </div>
           
           <h1 className="my-8 text-xl text-zinc-700 text-center">
-            Sign up to Blueberry AI
+            Sign up to Purpleberry AI
           </h1>
           
        
