@@ -87,7 +87,7 @@ const websitePlatforms = [
     icon: <LifeBuoy className="h-5 w-5 flex-shrink-0 text-green-600" />,
     instructions: [
       "Having trouble integrating the widget?",
-      "Reach out to us at support@aiblueberry.co",
+      "Reach out to us at info@purpleberryai.com",
       "We'll help you get set up as soon as possible!"
     ]
   }
@@ -312,7 +312,7 @@ const PlatformIntegration = () => {
     return `<div id="chat-widget-container"></div>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/shubhambansal2/chatbotintegration/chatbot.bundle_v9.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/PurpleberryAI/Chatwidget/chatbot.bundle_v9.js"></script>
 <script>
     // Initialize with configuration
     window.ChatWidget.render('chat-widget-container', {
