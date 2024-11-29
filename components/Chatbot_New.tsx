@@ -178,14 +178,14 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
           botAudioRef.current.play();
         }
         
-        typeWriterEffect(botMessageId, data.response || 'Bot did not provide a response');
-
+        typeWriterEffect(botMessageId, data.response || 'I am having trouble processing your message. Please try again.');
         await axios.post(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbot/${chatbotId}/${userId}/save_message_to_db/`, {
             session_id: sessionId,
             consumer_id: consumerId, // Assuming this is a constant value, adjust if needed
             consumer_name: consumerName,
             message: userInput,
-            bot_message: data.response
+            bot_message: data.response,
+            message_time: new Date().toISOString()
           }, {
             headers: { 'Content-Type': 'application/json' }
           }).then(response => {

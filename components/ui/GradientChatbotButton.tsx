@@ -50,8 +50,8 @@ const GradientButton = () => {
           </div>
           
           <div className="text-center">
-            <h3 className="text-white text-xl font-semibold">Create new GPT-4</h3>
-            <p className="text-white text-lg">Chatbot</p>
+            <h3 className="text-white text-xl font-semibold">Create new AI Chatbot</h3>
+            {/* <p className="text-white text-lg">Chatbot</p> */}
           </div>
         </div>
         

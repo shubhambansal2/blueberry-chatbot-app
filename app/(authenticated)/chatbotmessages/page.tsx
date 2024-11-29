@@ -31,6 +31,7 @@ interface Message {
     sender: string;
     content: string;
     chatbot: string;
+    message_time: string;
   }
   
   interface Consumer {
@@ -212,14 +213,17 @@ const ChatbotMessagesPage = () => {
         `https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbot/${chatbotId}/${userId}/${consumerId}/get_messages_from_db/`
       );
 
-      const fetchedMessages: Message[] = response.data.messages.map(
-        (msg: any, index: number) => ({
+      const fetchedMessages: Message[] = response.data.messages
+        .map((msg: any, index: number) => ({
           id: index + 1,
-          sender: msg.is_from_user ? 'User' : 'Chatbot',
+          sender: msg.is_from_user ? 'User' : 'Chatbot', 
           content: msg.content,
           chatbot: `Chatbot${chatbotId}`,
-        })
-      );
+          message_time: msg.timestamp
+        }))
+        .sort((a: Message, b: Message) => 
+          new Date(a.message_time).getTime() - new Date(b.message_time).getTime()
+        );
 
       setMessages(fetchedMessages);
     } catch (error) {
@@ -317,42 +321,67 @@ const ChatbotMessagesPage = () => {
         {/* Messages container */}
         <div className="flex-1 overflow-y-auto bg-white">
           {isMessagesLoading ? <ChatSkeleton /> : (
-            <div className="p-4 mt-80">
+            <div className="p-4">
               {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="flex flex-col h-full ">
                   <p className="text-gray-500 text-3xl font-bold">No Conversations Yet</p>
                 </div>
               ) : (
                 <>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex items-start space-x-2 mb-4 ${
-                        message.sender === 'User' ? 'justify-start' : 'justify-end'
-                      }`}
-                    >
-                      {message.sender === 'User' && (
-                        <div className="flex-shrink-0">
-                          <User className="h-8 w-8 text-gray-600" />
+                  {messages.reduce((acc: JSX.Element[], message, index) => {
+                    const currentDate = new Date(message.message_time).toLocaleDateString();
+                    const prevDate = index > 0 ? new Date(messages[index - 1].message_time).toLocaleDateString() : null;
+
+                    if (currentDate !== prevDate) {
+                      acc.push(
+                        <div key={`date-${currentDate}`} className="flex items-center my-4">
+                          <div className="flex-grow border-t border-dotted border-gray-300"></div>
+                          <span className="mx-4 text-sm text-gray-500">{currentDate}</span>
+                          <div className="flex-grow border-t border-dotted border-gray-300"></div>
                         </div>
-                      )}
+                      );
+                    }
+
+                    acc.push(
                       <div
-                        className={`max-w-[70%] p-3 rounded-lg ${
-                          message.sender === 'User'
-                            ? 'bg-blue-100 text-blue-900'
-                            : 'bg-gray-100 text-gray-900'
+                        key={message.id}
+                        className={`flex items-start space-x-2 mb-4 ${
+                          message.sender === 'User' ? 'justify-start' : 'justify-end'
                         }`}
                       >
-                        <p className="text-sm font-medium mb-1">{message.sender}</p>
-                        <p className="text-sm">{message.content}</p>
-                      </div>
-                      {message.sender !== 'User' && (
-                        <div className="flex-shrink-0">
-                          <MessageCircle className="h-8 w-8 text-blue-600" />
+                        {message.sender === 'User' && (
+                          <div className="flex-shrink-0">
+                            <User className="h-8 w-8 text-gray-600" />
+                          </div>
+                        )}
+                        <div
+                          className={`max-w-[70%] p-3 rounded-lg ${
+                            message.sender === 'User'
+                              ? 'bg-blue-100 text-blue-900'
+                              : 'bg-gray-100 text-gray-900'
+                          }`}
+                        >
+                          <p className="text-sm font-medium mb-1">{message.sender}</p>
+                          <p className="text-sm">{message.content}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(message.message_time).toLocaleDateString([], {
+                              month: 'short',
+                              day: 'numeric'
+                            }) + ' ' + new Date(message.message_time).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        {message.sender !== 'User' && (
+                          <div className="flex-shrink-0">
+                            <MessageCircle className="h-8 w-8 text-blue-600" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                    return acc;
+                  }, [])}
                   <div ref={messagesEndRef} />
                 </>
               )}
