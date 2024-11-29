@@ -457,8 +457,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 <Send size={20} className="text-white" color='white' />
               </button>
             </div>
-            <div className="text-center mt-3 text-xs text-gray-400 rounded-xl">
-              Powered by Blueberry AI
+            <div className="text-center mt-3 text-xs font-semibold text-black rounded-xl">
+              Powered by Purpleberry AI
             </div>
           </div>
         </div>
