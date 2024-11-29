@@ -77,7 +77,7 @@ export function SidebarLayout({
       ),
     },
     {
-      label: "Build New Chatbot",
+      label: "Build New Chatbot", 
       href: "/createchatbot",
       icon: (
         <IconTool className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
@@ -85,7 +85,7 @@ export function SidebarLayout({
     },
     {
       label: "Chatbots",
-      href: "/testchatbot",
+      href: "/testchatbot", 
       icon: (
         <IconMessage2Code className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
@@ -115,6 +115,88 @@ export function SidebarLayout({
 
   const [open, setOpen] = useState(true);
   const [currentPath, setCurrentPath] = useState(() => "/");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+   // Effect to prevent body scroll when mobile menu is open
+   useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  const MobileNav = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 bg-slate-150 backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+          className="fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-lg"
+        >
+          <div className="flex justify-between items-center p-4 border-b">
+            <Logo showText={true} />
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 hover:bg-gray-100 rounded-md"
+            >
+              <IconX className="h-6 w-6" />
+            </button>
+          </div>
+          
+          <div className="relative flex flex-col h-[calc(100vh-64px)]">
+            <div className="flex-1 overflow-y-auto px-4 py-6">
+              <nav className="space-y-2">
+                {primaryLinks.map((link, idx) => (
+                  <Link
+                    key={idx}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    <span className="text-gray-600">{link.icon}</span>
+                    <span className="text-sm font-medium">{link.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+            
+            <div className="mt-auto border-t bg-white px-4 py-4">
+              <div className="space-y-2">
+                <Link
+                  href="#"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  <IconUserBolt className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm font-medium"><UserEmailDisplay /></span>
+                </Link>
+                <Link
+                  href="/logout"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  <IconLogout className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm font-medium">Logout</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+
 
   // Update currentPath when the component mounts
   React.useEffect(() => {
@@ -127,7 +209,23 @@ export function SidebarLayout({
       "h-screen",
       className
     )}>
-      <div className="h-full relative">
+            <div className="md:hidden p-4 bg-slate-150 border-b">
+        <button 
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="p-2 hover:bg-slate-150 rounded-md"
+        >
+          <IconMenu2 className="h-6 w-6" />
+        </button>
+      </div>
+
+      {/* Mobile Navigation with Backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && <MobileNav />}
+      </AnimatePresence>
+
+
+      {/* Desktop Sidebar */}
+      <div className="h-full relative hidden md:block">
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="flex flex-col h-full">
             {/* Top Section with Scrollable Content */}
@@ -151,7 +249,7 @@ export function SidebarLayout({
               />
               <SidebarLink
                 link={{
-                  label: "Logout", 
+                  label: "Logout",
                   href: "/logout",
                   icon: <IconLogout className="h-5 w-5 flex-shrink-0 text-neutral-700" />
                 }}
@@ -333,68 +431,86 @@ export const DesktopSidebar = ({
   );
 };
 
-
-
 export const SidebarLink = ({
   link,
   className,
-  ...props
+  ...props // Accept additional props
 }: {
   link: Links;
   className?: string;
-  props?: LinkProps;
+  props?: LinkProps; // Ensure props can include LinkProps
 }) => {
-  const { open } = useSidebar();
-  const pathname = usePathname();
-  
-  const isActive = pathname === link.href;
+  // Wrap component in error boundary to catch missing context
+  try {
+    const { open } = useSidebar();
+    const pathname = usePathname();
+    const isActive = pathname === link.href;
 
-  return (
-    <Link
-      href={link.href}
-      className={cn(
-        "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
-        "hover:bg-secondary/50",
-        "overflow-hidden",
-        isActive && "bg-primary text-black",
-        !isActive && "text-neutral-700",
-        className,
-      )}
-      {...props}
-    >
-      <div className={cn(
-        "flex-shrink-0 transition-colors",
-        isActive ? "text-black" : "text-neutral-700",
-        "group-hover/sidebar:text-black"
-      )}>
-        {link.icon}
-      </div>
-
-      <motion.div
-        initial={false}
-        animate={{
-          width: open ? "auto" : 0,
-          opacity: open ? 1 : 0
-        }}
-        transition={{
-          duration: 0.2,
-          ease: "easeInOut"
-        }}
-        className="flex items-center"
+    return (
+      <Link
+        href={link.href}
+        className={cn(
+          "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
+          "hover:bg-secondary/50", 
+          "overflow-hidden",
+          isActive && "bg-primary text-black",
+          !isActive && "text-neutral-700",
+          className,
+        )}
+        {...props} // Spread additional props here
       >
-        <span className={cn(
-          "inline-block whitespace-nowrap text-sm",
+        <div className={cn(
+          "flex-shrink-0 transition-colors",
           isActive ? "text-black" : "text-neutral-700",
           "group-hover/sidebar:text-black"
         )}>
-          {link.label}
-        </span>
-      </motion.div>
-    </Link>
-  );
+          {link.icon}
+        </div>
+
+        <motion.div
+          initial={false}
+          animate={{
+            width: open ? "auto" : 0,
+            opacity: open ? 1 : 0
+          }}
+          transition={{
+            duration: 0.2,
+            ease: "easeInOut"
+          }}
+          className="flex items-center"
+        >
+          <span className={cn(
+            "inline-block whitespace-nowrap text-sm",
+            isActive ? "text-black" : "text-neutral-700", 
+            "group-hover/sidebar:text-black"
+          )}>
+            {link.label}
+          </span>
+        </motion.div>
+      </Link>
+    );
+  } catch (error) {
+    // Return null or fallback UI if context is missing
+    console.error("SidebarLink must be used within a SidebarProvider");
+    return null;
+  }
 };
 
 export const MobileSidebar = ({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof motion.div>) => {
+  return (
+    <SidebarProvider>
+      <MobileSidebarContent className={className} {...props}>
+        {children}
+      </MobileSidebarContent>
+    </SidebarProvider>
+  );
+};
+
+const MobileSidebarContent = ({
   className,
   children,
   ...props
@@ -403,7 +519,7 @@ export const MobileSidebar = ({
   return (
     <motion.div
       className={cn(
-        "flex h-10 w-full flex-row items-center justify-between bg-neutral-100 px-4 py-4  md:hidden",
+        "flex h-10 w-full flex-row items-center justify-between bg-neutral-100 px-4 py-4 bg-slate-150 md:hidden",
       )}
       {...props}
     >

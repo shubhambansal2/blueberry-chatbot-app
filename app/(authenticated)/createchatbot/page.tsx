@@ -94,31 +94,33 @@ const CreateChatbotPage = () => {
   const router = useRouter();
 
   return (
-    <div className="container mx-auto max-w-6xl min-h-screen">
-      <div className="flex justify-between items-center mb-8 mt-8">
-        <h1 className="text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Want to edit an existing chatbot?</span>
-          <Link href="/testchatbot" className="px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition-colors">
-            My Chatbots
-          </Link>
-          <button
-            onClick={() => {
-              useChatbotStore.getState().resetForm();
-              console.log("Form reset");
-              window.location.reload();
-            }}
-            className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-600 transition-colors"
-          >
-            Clear Form
-          </button>
+    <div className="container mx-auto max-w-6xl min-h-screen px-4 md:px-6 my-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 mt-8 gap-4 md:gap-2 md:mb-10">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-2 w-full md:w-auto">
+          <span className="text-sm text-gray-500 hidden md:inline">Want to edit an existing chatbot?</span>
+          <div className="flex flex-row gap-2 w-full md:w-auto">
+            <Link href="/testchatbot" className="flex-1 md:flex-none text-center px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition-colors text-sm md:text-base">
+              My Chatbots
+            </Link>
+            <button
+              onClick={() => {
+                useChatbotStore.getState().resetForm();
+                console.log("Form reset");
+                window.location.reload();
+              }}
+              className="flex-1 md:flex-none text-center px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-600 transition-colors text-sm md:text-base"
+            >
+              Clear Form
+            </button>
+          </div>
         </div>
       </div>
       <div className="relative">
-        <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px]">
+        <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px] md:min-h-[900px] p-4 md:p-10">
           <div className="absolute inset-[0.5px] rounded-2xl bg-white overflow-hidden">
-            <div className="w-full h-full p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-              <div className="absolute top-4 right-4 z-50">
+            <div className="w-full h-full p-4 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+              <div className="absolute top-4 right-4 z-50 hidden md:block">
                 {selectedId !== "activation" && (
                   <ActivationDialog 
                     isValid={isValid}

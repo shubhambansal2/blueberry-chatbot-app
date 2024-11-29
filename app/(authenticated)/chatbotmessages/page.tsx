@@ -67,7 +67,7 @@ interface Message {
       <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-black">Conversations</h2>
+        <h2 className="text-lg font-semibold text-black hidden md:block">Conversations</h2>
         <Button
           variant="ghost"
           size="icon"
@@ -275,25 +275,27 @@ const ChatbotMessagesPage = () => {
       <div className="flex h-full">
       {/* Toggle button for small screens */}
       <button
-        className="md:hidden fixed top-4 left-4 z-40 p-2 bg-gray-800 text-white rounded-md shadow-md hover:bg-gray-700 transition-colors"
+        className="md:hidden fixed top-4 right-4 z-40 p-2 bg-gray-800 text-white rounded-md shadow-md hover:bg-gray-700 transition-colors flex items-center gap-2"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         <Menu className="h-6 w-6" />
+        <span>Conversation Menu</span>
       </button>
   
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+          className="fixed inset-0 bg-slate-150/50 z-20 md:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
         
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-quinary flex-none fixed md:sticky top-0 h-full
-          transition-transform duration-300 ease-in-out shadow-lg shadow-gray-400/50
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+        className={`w-64 bg-quinary flex-none fixed md:sticky top-0 h-full right-0 md:left-0
+          transition-transform duration-300 ease-in-out shadow-lg shadow-gray-400/50 z-30
+          ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'} 
           md:translate-x-0`}
       >
         <Sidebar
@@ -310,7 +312,7 @@ const ChatbotMessagesPage = () => {
       </aside>
 
       {/* Main content area */}
-      <main className="flex-1 flex flex-col  min-w-0">
+      <main className={`flex-1 flex flex-col min-w-0 ${sidebarOpen ? 'md:blur-none blur-sm' : ''}`}>
         {/* Header */}
         <header className="flex-none">
           <h2 className="text-2xl font-bold p-4 text-black bg-quinary border-b">

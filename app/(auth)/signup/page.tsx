@@ -188,12 +188,12 @@ const SignUp = () => {
             </div>
           </form>
 
-          <p className="text-sm text-gray-600 text-center mt-6">
+          {/* <p className="text-sm text-gray-600 text-center mt-6">
             By continuing, you agree to our{' '}
             <a href="#" className="text-blue-600 hover:underline">terms of service</a>{' '}
             and{' '}
             <a href="#" className="text-blue-600 hover:underline">privacy policy</a>
-          </p>
+          </p> */}
 
           <Link
             href="/login"
