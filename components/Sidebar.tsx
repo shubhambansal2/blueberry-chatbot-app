@@ -359,10 +359,13 @@ export const DesktopSidebar = ({
   const { open, setOpen } = useSidebar();
   const [isHovered, setIsHovered] = useState(false);
 
+  // Move the debounced function outside useCallback
+  const debouncedOpenFn = (value: boolean) => {
+    setOpen(value);
+  };
+
   const debouncedOpen = useCallback(
-    debounce((value: boolean) => {
-      setOpen(value);
-    }, 500),
+    debounce(debouncedOpenFn, 500),
     [setOpen]
   );
 
@@ -370,9 +373,12 @@ export const DesktopSidebar = ({
     if (isHovered) {
       debouncedOpen(true);
     }
+    
+    return () => {
+      debouncedOpen.cancel();
+    };
   }, [isHovered, debouncedOpen]);
 
-  // Clear the debounce timer when mouse leaves immediately
   const handleMouseLeave = () => {
     debouncedOpen.cancel();
     setIsHovered(false);
@@ -438,62 +444,64 @@ export const SidebarLink = ({
 }: {
   link: Links;
   className?: string;
-  props?: LinkProps; // Ensure props can include LinkProps
+  props?: LinkProps;
 }) => {
-  // Wrap component in error boundary to catch missing context
-  try {
-    const { open } = useSidebar();
-    const pathname = usePathname();
-    const isActive = pathname === link.href;
-
-    return (
-      <Link
-        href={link.href}
-        className={cn(
-          "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
-          "hover:bg-secondary/50", 
-          "overflow-hidden",
-          isActive && "bg-primary text-black",
-          !isActive && "text-neutral-700",
-          className,
-        )}
-        {...props} // Spread additional props here
-      >
-        <div className={cn(
-          "flex-shrink-0 transition-colors",
-          isActive ? "text-black" : "text-neutral-700",
-          "group-hover/sidebar:text-black"
-        )}>
-          {link.icon}
-        </div>
-
-        <motion.div
-          initial={false}
-          animate={{
-            width: open ? "auto" : 0,
-            opacity: open ? 1 : 0
-          }}
-          transition={{
-            duration: 0.2,
-            ease: "easeInOut"
-          }}
-          className="flex items-center"
-        >
-          <span className={cn(
-            "inline-block whitespace-nowrap text-sm",
-            isActive ? "text-black" : "text-neutral-700", 
-            "group-hover/sidebar:text-black"
-          )}>
-            {link.label}
-          </span>
-        </motion.div>
-      </Link>
-    );
-  } catch (error) {
-    // Return null or fallback UI if context is missing
+  // Move hooks to the top level - no conditional execution
+  const context = useSidebar();
+  const pathname = usePathname();
+  
+  // Handle case where context is missing
+  if (!context) {
     console.error("SidebarLink must be used within a SidebarProvider");
     return null;
   }
+  
+  const { open } = context;
+  const isActive = pathname === link.href;
+
+  return (
+    <Link
+      href={link.href}
+      className={cn(
+        "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
+        "hover:bg-secondary/50", 
+        "overflow-hidden",
+        isActive && "bg-primary text-black",
+        !isActive && "text-neutral-700",
+        className,
+      )}
+      {...props}
+    >
+      <div className={cn(
+        "flex-shrink-0 transition-colors",
+        isActive ? "text-black" : "text-neutral-700",
+        "group-hover/sidebar:text-black"
+      )}>
+        {link.icon}
+      </div>
+
+      <motion.div
+        initial={false}
+        animate={{
+          width: open ? "auto" : 0,
+          opacity: open ? 1 : 0
+        }}
+        transition={{
+          duration: 0.2,
+          ease: "easeInOut"
+        }}
+        className="flex items-center"
+      >
+        <span className={cn(
+          "inline-block whitespace-nowrap text-sm",
+          isActive ? "text-black" : "text-neutral-700", 
+          "group-hover/sidebar:text-black"
+        )}>
+          {link.label}
+        </span>
+      </motion.div>
+    </Link>
+  );
 };
 
 export const MobileSidebar = ({
