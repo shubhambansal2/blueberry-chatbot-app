@@ -325,16 +325,16 @@ const PlatformIntegration = () => {
 
   return (
     <div className='flex flex-col items-center justify-center'>
-    <Card className="w-full p-6">
-      <h2 className="text-2xl font-semibold mb-6">Deploy Chatbot widget in your Website</h2>
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 border-r pr-4">
+    <Card className="w-full p-4 md:p-6">
+      <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Deploy Chatbot widget in your Website</h2>
+      <div className="flex flex-col md:flex-row">
+        {/* Sidebar - Platform Selection */}
+        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r pb-4 md:pb-0 md:pr-4 mb-4 md:mb-0">
           {websitePlatforms.map((platform) => (
             <button
               key={platform.name}
               onClick={() => setSelectedPlatform(platform.name)}
-              className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-2 transition-colors
+              className={`w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg mb-2 flex items-center gap-2 transition-colors
                 ${selectedPlatform === platform.name 
                   ? 'bg-primary text-primary-foreground' 
                   : 'hover:bg-secondary/20'
@@ -347,10 +347,10 @@ const PlatformIntegration = () => {
         </div>
 
         {/* Chatbot Selection */}
-        <div className="w-64 border-r px-4">
-          <h3 className="text-lg font-semibold mb-4">Select Chatbot</h3>
+        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r px-2 md:px-4 pb-4 md:pb-0 mb-4 md:mb-0">
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Select Chatbot</h3>
           {isLoading ? (
-            <div className="flex items-center justify-center h-32 text-muted-foreground">
+            <div className="flex items-center justify-center h-24 md:h-32 text-muted-foreground">
               Loading chatbots...
             </div>
           ) : (
@@ -359,7 +359,7 @@ const PlatformIntegration = () => {
                 <button
                   key={chatbot.chatbot_id}
                   onClick={() => setSelectedChatbot(chatbot)}
-                  className={`w-full text-center font-semibold px-4 py-3 rounded-lg transition-colors border border-gray-200
+                  className={`w-full text-center font-semibold px-3 md:px-4 py-2 md:py-3 rounded-lg transition-colors border border-gray-200 text-sm md:text-base
                     ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
                       ? 'bg-primary text-primary-foreground border-primary' 
                       : 'hover:bg-secondary/20'
@@ -373,22 +373,22 @@ const PlatformIntegration = () => {
         </div>
         
         {/* Content Area */}
-        <div className="flex-1 pl-6">
+        <div className="w-full md:flex-1 px-2 md:pl-6">
           {selectedPlatform ? (
             <div>
-              <h3 className="text-xl font-semibold mb-4">
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
                 {selectedPlatform === 'Need Help?' ? selectedPlatform : `Deploy to ${selectedPlatform}`}
               </h3>
               {selectedPlatform !== 'Need Help?' && (
-                <p className="text-muted-foreground mb-4">
+                <p className="text-muted-foreground mb-3 md:mb-4 text-sm md:text-base">
                   Follow the steps below to deploy your chatbot
                 </p>
               )}
               
               {/* Platform-specific instructions */}
-              <div className="mb-6">
+              <div className="mb-4 md:mb-6">
                 {websitePlatforms.find(p => p.name === selectedPlatform)?.instructions.map((instruction, index) => (
-                  <p key={index} className="mb-2" style={{ fontSize: selectedPlatform === 'Need Help?' ? '1rem' : '1rem' }}>
+                  <p key={index} className="mb-2 text-sm md:text-base">
                     {instruction}
                   </p>
                 ))}
@@ -396,27 +396,26 @@ const PlatformIntegration = () => {
 
               {/* Code block */}
               {selectedPlatform !== 'Need Help?' && (
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3">Integration Code</h4>
+                <div className="mb-4 md:mb-6">
+                  <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Integration Code</h4>
                   <CodeBlock code={getWidgetCode()} />
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
+            <div className="flex items-center justify-center h-32 md:h-full text-muted-foreground text-sm md:text-base">
               Select a platform to get started
             </div>
           )}
         </div>
       </div>
     </Card>
-    <Card className='mt-10 w-full p-6'>
-      <h2 className="text-2xl font-semibold mb-6">Deploy your Chatbots to Whatsapp and Instagram Business</h2>
-      <button className='bg-primary text-primary-foreground px-4 py-2 rounded-lg'>
+    <Card className='mt-6 md:mt-10 w-full p-4 md:p-6'>
+      <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Deploy your Chatbots to Whatsapp and Instagram Business</h2>
+      <button className='bg-primary text-primary-foreground px-3 md:px-4 py-2 rounded-lg text-sm md:text-base'>
         Coming Soon
       </button>
     </Card>
-
     </div>
   );
 };

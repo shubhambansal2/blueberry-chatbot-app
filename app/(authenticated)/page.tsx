@@ -10,14 +10,14 @@ export default function Home() {
   return (
     <StrictMode>
   <div className="flex flex-col gap-10">
-  <Card className="bg-quinary shadow-lg ml-8 mt-10">
-    <CardContent className="p-6">
-      <h1 className="text-3xl font-bold mb-2">Welcome to Purpleberry AI 👋</h1>
-      <p className="text-gray-600">
+  <Card className="bg-quinary shadow-lg mx-4 md:mx-8 mt-6 md:mt-10">
+    <CardContent className="p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome to Purpleberry AI 👋</h1>
+      <p className="text-sm md:text-base text-gray-600">
         Welcome to Purpleberry AI, start building your chatbot with powerful technology. Get ready to revolutionize your customer interactions!
       </p>
       <button 
-        className="mt-4 bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800"
+        className="mt-4 w-full md:w-auto bg-black text-white px-4 md:px-6 py-2 rounded-md hover:bg-gray-800 text-sm md:text-base"
         onClick={() => window.open('https://www.loom.com/share/5bb5650434b0405c91ab7b244ceeb757?sid=17b0cec0-8f19-400d-a3ae-c06ec6b321d3', '_blank')}
       >
         Learn How to Build and Deploy Chatbots in Minutes

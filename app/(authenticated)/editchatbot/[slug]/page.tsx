@@ -313,19 +313,21 @@ const EditChatbotPage = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-6xl h-full">
-      <div className="flex justify-between items-center mb-8 mt-8">
-        <h1 className="text-3xl font-bold text-gray-800">Edit an existing Chatbot</h1>
-        <LeaveDialog 
-          onReset={resetForm}
-        />
+    <div className="container mx-auto max-w-6xl h-full px-4 md:px-6 my-4 ">
+      <div className="flex justify-between items-center mb-6 md:mb-8 mt-6 md:mt-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 hidden md:block">Edit an existing Chatbot</h1>
+        <div className="items-center ">
+          <LeaveDialog 
+            onReset={resetForm}
+          />
+        </div>
       </div>
       
       <div className="relative">
-        <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px]">
-          <div className="absolute inset-[0.5px] rounded-2xl bg-white">
-            <div className="w-full h-full p-8 overflow-hidden">
-              <div className="absolute top-4 right-4 z-50">
+      <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px] md:min-h-[900px] p-4 md:p-10">
+          <div className="absolute inset-[0.5px] rounded-2xl bg-white overflow-hidden">
+            <div className="w-full h-full p-4 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+              <div className="absolute top-4 right-4 z-50 hidden md:block">
                 {selectedId !== 'activation' && (
                   <ActivationDialogue_Edit 
                     isValid={isValid}
