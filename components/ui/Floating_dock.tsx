@@ -9,7 +9,7 @@ import {
   useTransform,
 } from "framer-motion";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
  
 type DockItem = {
   title: string;
@@ -193,7 +193,19 @@ function IconContainer({
   onSelect?: (id: string) => void;
 }) {
   let ref = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   let distance = useTransform(mouseX, (val) => {
     let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
@@ -201,9 +213,9 @@ function IconContainer({
  
   let widthTransform = useTransform(distance, [-150, 0, 150], [30, 60, 30]);
   let heightTransform = useTransform(distance, [-150, 0, 150], [30, 60, 30]);
- 
   let widthTransformIcon = useTransform(distance, [-150, 0, 150], [15, 30, 15]);
   let heightTransformIcon = useTransform(distance, [-150, 0, 150], [15, 30, 15]);
+  let scaleTransform = useTransform(distance, [-150, 0, 150], [0.9, 1, 0.9]);
  
   let width = useSpring(widthTransform, {
     mass: 0.1,
@@ -247,8 +259,8 @@ function IconContainer({
         <motion.div
           ref={ref}
           style={{ 
-            width: window?.innerWidth >= 768 ? width : 40, 
-            height: window?.innerWidth >= 768 ? height : 40 
+            width: isMobile ? 40 : width, 
+            height: isMobile ? 40 : height 
           }}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
@@ -260,7 +272,7 @@ function IconContainer({
           )}
         >
           <AnimatePresence>
-            {hovered && window?.innerWidth >= 768 && (
+            {hovered && !isMobile && (
               <motion.div
                 initial={{ opacity: 0, y: 10, x: "-50%" }}
                 animate={{ opacity: 1, y: 0, x: "-50%" }}
@@ -275,8 +287,8 @@ function IconContainer({
           </AnimatePresence>
           <motion.div
             style={{ 
-              width: window?.innerWidth >= 768 ? widthIcon : 20,
-              height: window?.innerWidth >= 768 ? heightIcon : 20
+              width: isMobile ? 20 : widthIcon,
+              height: isMobile ? 20 : heightIcon
             }}
             className={cn(
               "flex items-center justify-center",
@@ -293,7 +305,7 @@ function IconContainer({
           isSelected && "text-blue-600 dark:text-blue-400"
         )}
         style={{
-          scale: window?.innerWidth >= 768 ? useTransform(distance, [-150, 0, 150], [0.9, 1, 0.9]) : 1
+          scale: isMobile ? 1 : scaleTransform
         }}
       >
         {title}
