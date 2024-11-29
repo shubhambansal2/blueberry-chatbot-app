@@ -16,7 +16,10 @@ export default function Home() {
       <p className="text-gray-600">
         Welcome to Purpleberry AI, start building your chatbot with powerful technology. Get ready to revolutionize your customer interactions!
       </p>
-      <button className="mt-4 bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800">
+      <button 
+        className="mt-4 bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800"
+        onClick={() => window.open('https://www.loom.com/share/5bb5650434b0405c91ab7b244ceeb757?sid=17b0cec0-8f19-400d-a3ae-c06ec6b321d3', '_blank')}
+      >
         Learn How to Build and Deploy Chatbots in Minutes
       </button>
     </CardContent>

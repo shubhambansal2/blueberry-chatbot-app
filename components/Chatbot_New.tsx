@@ -35,7 +35,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   chatbotId, 
   chatbotName, 
   apiKey,
-  consumerName = `${['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Sam', 'Riley', 'Quinn', 'Avery', 'Parker'][Math.floor(Math.random() * 10)]} ${['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'][Math.floor(Math.random() * 10)]}`,
+  consumerName = `User ${Math.random().toString(36).substring(2, 8)}`,
   consumerId = Math.random().toString(36).substring(2, 8),
   accentColor = '#2563eb' // default to blue-600
 }) => {
