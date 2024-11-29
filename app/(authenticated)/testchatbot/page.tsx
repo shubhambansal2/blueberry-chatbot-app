@@ -35,7 +35,7 @@ const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | 
         <div className="absolute top-4 right-4 flex gap-2">
           <button
             onClick={() => window.location.href = '/deploychatbot'}
-            className="bg-blue-80 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+            className="bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
           >
             Deploy
           </button>

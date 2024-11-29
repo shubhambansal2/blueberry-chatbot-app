@@ -75,7 +75,7 @@ export const CompanyDetailsForm = () => {
     <div className="space-y-6 w-full max-w-2xl">
       <div className="space-y-2">
         <label htmlFor="companyName" className="block text-sm font-medium">
-          Organization Name *
+          Organization Name 
         </label>
         <input
           id="companyName"
@@ -108,7 +108,7 @@ export const CompanyDetailsForm = () => {
 
       <div className="space-y-2">
         <label htmlFor="companyDetails" className="block text-sm font-medium">
-          Organization Details *
+          Organization Details
         </label>
         <textarea
           placeholder="Details of your organization that your chatbot should know"
