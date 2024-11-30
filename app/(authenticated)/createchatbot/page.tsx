@@ -94,8 +94,8 @@ const CreateChatbotPage = () => {
   const router = useRouter();
 
   return (
-    <div className="container mx-auto max-w-6xl min-h-screen px-4 md:px-6 my-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 mt-8 gap-4 md:gap-2 md:mb-10">
+    <div className="container mx-auto max-w-6xl h-full px-4 md:px-6 my-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 mt-6 md:mt-8 gap-4 md:gap-2">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
         <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-2 w-full md:w-auto">
           <span className="text-sm text-gray-500 hidden md:inline">Want to edit an existing chatbot?</span>
@@ -117,7 +117,7 @@ const CreateChatbotPage = () => {
         </div>
       </div>
       <div className="relative">
-        <BackgroundGradient animate={false} className="rounded-2xl min-h-[800px] md:min-h-[900px] p-4 md:p-10">
+        <BackgroundGradient animate={false} className="rounded-2xl min-h-[700px] md:min-h-[800px] p-4 md:p-10">
           <div className="absolute inset-[0.5px] rounded-2xl bg-white overflow-hidden">
             <div className="w-full h-full p-4 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               <div className="absolute top-4 right-4 z-50 hidden md:block">
