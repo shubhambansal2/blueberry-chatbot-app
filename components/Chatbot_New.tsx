@@ -185,7 +185,6 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
             consumer_name: consumerName,
             message: userInput,
             bot_message: data.response,
-            message_time: new Date().toISOString()
           }, {
             headers: { 'Content-Type': 'application/json' }
           }).then(response => {
