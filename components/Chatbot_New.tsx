@@ -179,7 +179,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
         }
         
         typeWriterEffect(botMessageId, data.response || 'I am having trouble processing your message. Please try again.');
-        await axios.post(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbot/${chatbotId}/${userId}/save_message_to_db/`, {
+        await axios.post(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbot/${chatbotId}/save_message_to_db/`, {
             session_id: sessionId,
             consumer_id: consumerId, // Assuming this is a constant value, adjust if needed
             consumer_name: consumerName,
