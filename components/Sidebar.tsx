@@ -30,6 +30,7 @@ import {
   IconNotebook,
   IconMailbox,
   IconInboxOff,
+  IconUserPlus,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 import { debounce } from "lodash";
@@ -102,6 +103,13 @@ export function SidebarLayout({
       href: "/chatbotmessages",
       icon: (
         <IconInbox  className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+      ),
+    },
+    {
+      label: "Leads",
+      href: "/leads",
+      icon: (
+        <IconUserPlus  className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
     },
     {
