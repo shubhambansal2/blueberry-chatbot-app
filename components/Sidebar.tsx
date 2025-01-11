@@ -113,8 +113,8 @@ export function SidebarLayout({
       ),
     },
     {
-      label: "Integrations (Coming Soon)",
-      href: "#",
+      label: "Integrations",
+      href: "/dataintegrations",
       icon: (
         <IconApi className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
