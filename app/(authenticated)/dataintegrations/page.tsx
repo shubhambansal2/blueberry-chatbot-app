@@ -163,7 +163,7 @@ export default function DataIntegrations() {
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/api/users/delete_dataintegrations/${user}/`, {
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/delete_dataintegrations/${user}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
