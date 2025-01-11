@@ -7,6 +7,7 @@ import { MessageCircle, X, Send } from 'lucide-react';
 import MessageFormatter from './MessageFormatter' 
 import axios from 'axios';
 
+
 interface ChatWidgetProps {
   chatbotId: string;
   chatbotName: string;
