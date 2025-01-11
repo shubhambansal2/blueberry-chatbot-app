@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '../components/ui/Card';
+import { Loader2 } from "lucide-react";
 
 interface Product {
   id: string;
@@ -31,6 +32,7 @@ interface ProductsData {
 const ProductsTable = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [shopUrl, setShopUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log('fetching products')
@@ -51,11 +53,31 @@ const ProductsTable = () => {
         setProducts(data.data.products.edges.map(edge => edge.node));
       } catch (error) {
         console.error('Error fetching products:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">No Products found for this shopify account</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
