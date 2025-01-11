@@ -66,8 +66,7 @@ export default function DataIntegrations() {
         return
       }
 
-      const authUrl = `https://saudi-connecticut-scored-shanghai.trycloudflare.com/auth/login?shop=${shopifyUrl}&state=${state}`
-    // const authUrl = `https://purpleberry-chatbot-404342c65d45.herokuapp.com/auth/login?shop=${shopifyUrl}&state=${state}`
+    const authUrl = `https://purpleberry-chatbot-404342c65d45.herokuapp.com/auth/login?shop=${shopifyUrl}&state=${state}`
       
       localStorage.setItem('pendingShopifyIntegration', JSON.stringify({
         shop: shopifyUrl,
