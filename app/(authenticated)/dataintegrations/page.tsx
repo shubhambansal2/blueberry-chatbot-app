@@ -26,7 +26,7 @@ export default function DataIntegrations() {
         return
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/api/users/get_dataintegrations/${user}/`)
+      const response = await fetch(`https://mighty-dusk-404342c65d45.herokuapp.com/api/users/get_dataintegrations/${user}/`)
       const data = await response.json()
       console.log('Integration data:', data)
 
