@@ -26,7 +26,7 @@ export default function DataIntegrations() {
         return
       }
 
-      const response = await fetch(`https://mighty-dusk-404342c65d45.herokuapp.com/api/users/get_dataintegrations/${user}/`)
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/get_dataintegrations/${user}/`)
       const data = await response.json()
       console.log('Integration data:', data)
 
@@ -68,7 +68,7 @@ export default function DataIntegrations() {
 
     const authUrl = `https://purpleberry-chatbot-404342c65d45.herokuapp.com/auth/login?shop=${shopifyUrl}&state=${state}`
       
-      localStorage.setItem('pendingShopifyIntegration', JSON.stringify({
+    localStorage.setItem('pendingShopifyIntegration', JSON.stringify({
         shop: shopifyUrl,
         user: user
       }))
@@ -83,6 +83,8 @@ export default function DataIntegrations() {
 
   useEffect(() => {
     const handleRedirectBack = async () => {
+      console.log('handleRedirectBack')
+      setLoading(true)
       const pendingIntegration = localStorage.getItem('pendingShopifyIntegration')
       
       if (pendingIntegration) {
