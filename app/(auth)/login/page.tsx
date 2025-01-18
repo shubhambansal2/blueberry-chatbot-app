@@ -79,14 +79,6 @@ const SignIn: NextPage = () => {
           />
         </div>
 
-        {/* Mobile message */}
-        {/* <div className="lg:hidden flex flex-col items-center justify-center px-6 mt-40">
-          <Logo textClassName="items-center justify-center text-zinc-700" />
-          <p className="text-center text-2xl mt-6 text-gray-600">
-            We are working hard to make this application mobile friendly. Until then, please use a desktop or laptop to get started.
-          </p>
-        </div> */}
-
         {/* Desktop/tablet view */}
         <div className=" px-10 py-20 rounded-xl bg-white shadow-lg w-[30rem] mt-40 lg:mt-40 mx-4 relative z-10">
           <div className="flex flex-col items-center justify-center">
@@ -167,26 +159,3 @@ const SignIn: NextPage = () => {
 
 export default SignIn;
 
-
-// import { Suspense } from 'react';
-// import Login from './login';
-
-// export default function Page() {
-//   return (
-//     <Suspense fallback={<div>Loading...</div>}>
-//       <Login />
-//     </Suspense>
-//   );
-// }
-
- {/* {socialButtons.map((button, index) => (
-              <button
-                type="button"
-                onClick={button.onClick}
-                className="flex flex-row space-x-2 w-full mx-auto bg-gray-50 justify-center items-center py-4 my-2 rounded-2xl hover:bg-gray-100"
-                key={`social-${index}`}
-              >
-                {button.icon}
-                <span>Sign in with {button.name}</span>
-              </button>
-            ))} */}
