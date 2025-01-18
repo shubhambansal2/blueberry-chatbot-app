@@ -21,7 +21,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const SignIn: NextPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [error, setError] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -30,8 +29,10 @@ const SignIn: NextPage = () => {
   const [isFromChatbot, setIsFromChatbot] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsFromChatbot(searchParams.get('from') === 'chatbot');
-  }, [searchParams]);
+    // Get URL parameters using window.location
+    const params = new URLSearchParams(window.location.search);
+    setIsFromChatbot(params.get('from') === 'chatbot');
+  }, []);
   
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
