@@ -6,11 +6,23 @@ export type FileData = {
   preview: string;
 };
 
+export interface Integration {
+  id: string;
+  shop: string;
+  platform: string;
+  created_at: string;
+}
+
 interface CompanyDetails {
   companyName: string;
   industry: string;
   companyDetails?: string;
   logo?: FileData | null;
+}
+
+interface AgentType {
+  isSalesAgent: boolean;
+  isSupportAgent: boolean;
 }
 
 interface ChatbotColor {
@@ -36,6 +48,7 @@ interface SpecialInstructions {
 interface DataSources {
   websites: Array<{ value: string }>;  // Updated to match FieldArray requirements
   documents: FileData[];
+  selectedIntegration?: Integration | null;
 }
 
 interface Activation {
@@ -53,6 +66,7 @@ interface Deployment {
 }
 
 export type ChatbotState = {
+  agentType: AgentType;
   companyDetails: CompanyDetails;
   chatbotDetails: ChatbotDetails;
   specialInstructions: SpecialInstructions;
@@ -61,6 +75,7 @@ export type ChatbotState = {
   deployment: Deployment;
   currentStep: string;
   setCurrentStep: (step: string) => void;
+  updateAgentType: (type: Partial<AgentType>) => void;
   updateCompanyDetails: (details: Partial<CompanyDetails>) => void;
   updateChatbotDetails: (details: Partial<ChatbotDetails>) => void;
   updateSpecialInstructions: (instructions: Partial<SpecialInstructions>) => void;
@@ -72,6 +87,10 @@ export type ChatbotState = {
 };
 
 const initialState = {
+  agentType: {
+    isSalesAgent: false,
+    isSupportAgent: false,
+  },
   companyDetails: {
     companyName: '',
     industry: '',
@@ -94,6 +113,7 @@ const initialState = {
   dataSources: {
     websites: [{ value: '' }], // Updated initial state to match new type
     documents: [],
+    selectedIntegration: null,
   },
   activation: {
     isActive: false,
@@ -115,6 +135,7 @@ export const useChatbotStore = create<ChatbotState>()(
     (set) => ({
       ...initialState,
       setCurrentStep: (step) => set({ currentStep: step }),
+      updateAgentType: (type) => set({ agentType: { ...initialState.agentType, ...type } }),
       updateCompanyDetails: (details) =>
         set((state) => ({
           companyDetails: { ...state.companyDetails, ...details },

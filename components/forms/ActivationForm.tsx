@@ -10,6 +10,7 @@ const ActivationForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
+    agentType,
     chatbotDetails,
     companyDetails,
     specialInstructions,
@@ -89,12 +90,14 @@ const ActivationForm = () => {
           'Authorization': `Bearer ${accessToken}`
         },
         body: JSON.stringify({
+          is_product_recommender: agentType.isSalesAgent,
           chatbot_name: chatbotDetails.name,
           company_name: companyDetails.companyName,
           company_industry: companyDetails.industry || "",
           company_details: companyDetails.companyDetails || "",
           special_instructions: specialInstructions.specialinstructions || "",
           question_answer_pairs: specialInstructions.exampleresponses || [],
+          integration_id: dataSources.selectedIntegration?.id || "",
           role: chatbotDetails.description || "",
           personality: chatbotDetails.personality || "",
           user: user,
@@ -148,7 +151,7 @@ const ActivationForm = () => {
             )}
           </Button>
           {(!chatbotDetails.name || !chatbotDetails.description || !chatbotDetails.personality) && (
-            <p className="text-red-500 text-sm mt-2 text-center">
+            <p className="text-gray-500 text-sm mt-2 text-center mx-auto">
               Please fill in all mandatory fields (Name, Description and Personality)
             </p>
           )}
@@ -249,8 +252,15 @@ const ActivationForm = () => {
                   </ul>
                 </div>
               )}
+
+              {dataSources.selectedIntegration && (
+                <div className="mt-2">
+                  <h4 className="font-medium text-sm">Data Integration:</h4>
+                  <p className="mt-1 text-sm">{dataSources.selectedIntegration.shop}</p>
+                </div>
+              ) }
               
-              {(!dataSources?.websites?.length && !documentsList.length) && (
+              {(!dataSources?.websites?.length && !documentsList.length && !dataSources.selectedIntegration) && (
                 <p className="text-sm text-gray-500 mt-2">No data sources added</p>
               )}
             </div>

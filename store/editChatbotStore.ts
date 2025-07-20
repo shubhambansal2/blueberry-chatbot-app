@@ -34,9 +34,23 @@ interface SpecialInstructions {
   exampleresponses: Array<{ question: string; answer: string }>;
 }
 
+// Add AgentType and Integration types
+export interface Integration {
+  id: string;
+  shop: string;
+  platform: string;
+  created_at: string;
+}
+
+interface AgentType {
+  isSalesAgent: boolean;
+  isSupportAgent: boolean;
+}
+
 interface DataSources {
-  websites: Array<{ value: string, source_id?: string }>;  // Updated to match FieldArray requirements
-  documents: Array<FileData >;
+  websites: Array<{ value: string, source_id?: string }>;
+  documents: FileData[];
+  selectedIntegration?: Integration | null;
 }
 
 interface Activation {
@@ -54,6 +68,7 @@ interface Deployment {
 }
 
 interface ChatbotState {
+  agentType: AgentType;
   companyDetails: CompanyDetails;
   chatbotDetails: ChatbotDetails;
   specialInstructions: SpecialInstructions;
@@ -68,11 +83,16 @@ interface ChatbotState {
   updateDataSources: (sources: Partial<DataSources>) => void;
   updateActivation: (activation: Partial<Activation>) => void;
   updateDeployment: (deployment: Partial<Deployment>) => void;
+  updateAgentType: (type: Partial<AgentType>) => void;
   resetForm: () => void;
   resetChatbotDetails: () => void;
 }
 
 const initialState = {
+  agentType: {
+    isSalesAgent: false,
+    isSupportAgent: false,
+  },
   companyDetails: {
     companyName: '',
     industry: '',
@@ -93,8 +113,9 @@ const initialState = {
     exampleresponses: [],
   },
   dataSources: {
-    websites: [{ value: '', source_id: undefined }], // Initial state with optional source_id
-    documents: [], // Array of FileData with optional source_id
+    websites: [{ value: '', source_id: undefined }],
+    documents: [],
+    selectedIntegration: null,
   },
   activation: {
     isActive: false,
@@ -116,6 +137,7 @@ export const editChatbotStore = create<ChatbotState>()(
     (set) => ({
       ...initialState,
       setCurrentStep: (step) => set({ currentStep: step }),
+      updateAgentType: (type) => set((state) => ({ agentType: { ...state.agentType, ...type } })),
       updateCompanyDetails: (details) =>
         set((state) => ({
           companyDetails: { ...state.companyDetails, ...details },

@@ -139,7 +139,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
       scrollToBottom();
 
       try {
-        const response = await fetch('https://desolate-bastion-55476-3d3016c3fa1a.herokuapp.com/chatwithcustombot', {
+        const response = await fetch('https://desolate-bastion-55476-3d3016c3fa1a.herokuapp.com/chatwithproductrecommendations', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

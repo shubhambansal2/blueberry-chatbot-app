@@ -10,6 +10,7 @@ import { CompanyDetailsForm } from '../../../components/forms/CompanyDetailsForm
 import { DataSourcesForm } from '../../../components/forms/DataSourcesForm';
 import { ChatbotDetailsForm } from '../../../components/forms/ChatbotDetailsForm';
 import { SpecialInstructionsForm } from '@components/forms/SpecialInstructionsForm';
+import ChatbotTypeForm from '../../../components/forms/ChatbotType';
 import ActivationForm from '../../../components/forms/ActivationForm';
 
 import {
@@ -18,9 +19,12 @@ import {
   IconFloatLeft,
   IconDatabase,
   IconChecks,
+  IconFunction,
+  IconSelect,
 } from "@tabler/icons-react";
 
 const formComponents: Record<string, React.FC> = {
+  'agent_type': ChatbotTypeForm,
   'company-details': CompanyDetailsForm,
   'data-sources': DataSourcesForm,
   'chatbot-details': ChatbotDetailsForm,
@@ -30,7 +34,7 @@ const formComponents: Record<string, React.FC> = {
 
 const CreateChatbotPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<string>("chatbot-details");
+  const [selectedId, setSelectedId] = useState<string>("agent_type");
   
   // Move the hook outside of any callbacks and use it directly in the component
   const chatbotDetails = useChatbotStore((state) => state.chatbotDetails);
@@ -44,9 +48,18 @@ const CreateChatbotPage = () => {
 
   const items = [
     {
+      id: "agent_type",
+      title: "Agent Functionality",
+      details: "Select the type of agent you want to build",
+      icon: (
+        <IconSelect className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+      ),
+      href: "#",
+    },
+    {
       id: "chatbot-details",
-      title: "Chatbot Details",
-      details: "Enter the chatbot details",
+      title: "Agent Details",
+      details: "Enter the agent details",
       icon: (
         <IconMessageChatbot className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
@@ -54,8 +67,8 @@ const CreateChatbotPage = () => {
     },
     {
       id: "company-details",
-      title: "Company Details",
-      details: "Enter the company details",
+      title: "Organisation Details",
+      details: "Enter the organisation details",
       icon: (
         <IconBuildings className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
@@ -96,12 +109,12 @@ const CreateChatbotPage = () => {
   return (
     <div className="container mx-auto max-w-6xl h-full px-4 md:px-6 my-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 mt-6 md:mt-8 gap-4 md:gap-2">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Build a new Chatbot</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Build a new Agent</h1>
         <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-2 w-full md:w-auto">
-          <span className="text-sm text-gray-500 hidden md:inline">Want to edit an existing chatbot?</span>
+          <span className="text-sm text-gray-500 hidden md:inline">Want to edit an existing Agent?</span>
           <div className="flex flex-row gap-2 w-full md:w-auto">
-            <Link href="/testchatbot" className="flex-1 md:flex-none text-center px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition-colors text-sm md:text-base">
-              My Chatbots
+            <Link href="/" className="flex-1 md:flex-none text-center px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition-colors text-sm md:text-base">
+              My Agents
             </Link>
             <button
               onClick={() => {

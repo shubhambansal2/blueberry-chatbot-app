@@ -9,7 +9,7 @@ import GradientButton from '../../../components/ui/GradientChatbotButton';
 import GradientCard from '../../../components/GradientChatbotCard';
 import DeleteDialogue from '../../../components/DeleteDialogue';
 import GlobalLoadingOverlay from '../../../components/GlobalLoadingOverlay';
-import ChatWidget from '../../../components/Chatbot_New';
+import ChatWidget from '../../../components/Chatbot_New2';
 import LoadingSkeletons from '../../../components/LoadingSkeletons';
 import ChatbotLoadingSkeleton from '../../../components/LoadingSkeletons';
 import TemplateCardShowcase from '../../../components/TemplateCardShowcase';
@@ -18,10 +18,14 @@ import TemplateCardShowcase from '../../../components/TemplateCardShowcase';
 
 const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
   if (!selectedChatbot) return null;
-  const consumerName = 'Your Test Messages';
-  const consumerId = '3';
+  const customerData = {
+    consumerName: 'Your Test Messages',
+    consumerId: '3',
+    isLoggedIn: true
+  };
+    
+  
   // const consumerName = localStorage.getItem('consumerName');
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className=" rounded-lg w-full  h-full flex flex-col relative">
@@ -29,22 +33,27 @@ const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | 
             chatbotId={selectedChatbot.chatbot_id.toString()}
             chatbotName={selectedChatbot.chatbot_name}
             apiKey="ABC"
-            consumerName={consumerName}
-            consumerId={consumerId}
+            accentColor="#FF0000"
+            customerData={customerData}
           />
         <div className="absolute top-4 right-4 flex gap-2">
-          <button
+          {/* <button
             onClick={() => window.location.href = '/deploychatbot'}
             className="bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
           >
             Deploy
-          </button>
+          </button> */}
           <button
-            onClick={onClose}
-            className="bg-red-800 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors"
-          >
-            Stop Testing
-          </button>
+  onClick={onClose}
+  className="group relative bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 py-2.5 px-6 rounded-lg font-medium transition-all duration-200 ease-in-out shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 active:scale-95"
+>
+  <span className="flex items-center gap-2">
+    <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    Stop Testing
+  </span>
+</button>
         </div>
       </div>
     </div>
@@ -126,7 +135,7 @@ const Testchatbotpage = () => {
   return (
       <div className="flex flex-col p-8 overflow-auto">
         
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Chatbots</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Agents</h2>
           <div className="flex flex-row items-center space-x-6 overflow-x-auto pb-4 mt-8">
           {!isLoadingChatbots && <div className="hidden lg:block"><GradientButton /></div>}
             <div className="flex flex-wrap gap-8">

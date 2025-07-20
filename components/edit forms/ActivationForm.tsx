@@ -102,6 +102,9 @@ const ActivationForm = () => {
       const accessToken = localStorage.getItem('accessToken');
       const user = localStorage.getItem('user');
       const chatbot_id = window.location.pathname.split('/').pop();
+      // Get agentType and selectedIntegration from store
+      const { agentType, dataSources } = editChatbotStore.getState();
+      const selectedIntegration = dataSources.selectedIntegration;
       const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${chatbot_id}/`, {
         method: 'POST',
         headers: {
@@ -117,6 +120,8 @@ const ActivationForm = () => {
           question_answer_pairs: specialInstructions.exampleresponses || [],
           role: chatbotDetails.description || "",
           personality: chatbotDetails.personality || "",
+          is_product_recommender: agentType.isSalesAgent,
+          integration_id: selectedIntegration?.id || "",
           user: user,
         })
       });
@@ -284,8 +289,15 @@ const ActivationForm = () => {
                 </ul>
               </div>
             )}
+
+            {dataSources.selectedIntegration && (
+                            <div className="mt-2">
+                              <h4 className="font-medium text-sm">Data Integration:</h4>
+                              <p className="mt-1 text-sm">{dataSources.selectedIntegration.shop}</p>
+                            </div>
+                          ) }
             
-            {(!dataSources?.websites?.length && !documentsList.length) && (
+            {(!dataSources?.websites?.length && !documentsList.length && !dataSources.selectedIntegration) && (
               <p className="text-sm text-gray-500 mt-2">No data sources added</p>
             )}
           </div>
