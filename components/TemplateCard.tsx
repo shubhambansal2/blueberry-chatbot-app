@@ -2,10 +2,7 @@ import React from 'react';
 import { GraduationCap, Building2, Search, Coffee, Hospital, PlaneIcon, HeartIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useChatbotStore } from 'store/useChatbotStore';
-import { coffeeShopTemplate } from 'store/templates';
-import { travelTemplate } from 'store/templates';
-import { hospitalTemplate } from 'store/templates';
-import { insuranceTemplate } from 'store/templates';
+import { coffeeTeaSpicesTemplate, tshirtStoreTemplate, organicProductsTemplate } from 'store/templates';
 
 
 interface TemplateProps {
@@ -27,7 +24,7 @@ const TemplateCard = ({
 
   const handleTemplateSelect = (template_id: string) => {
     console.log(`Selected template: ${template_id}`);
-    useChatbotStore.setState(template_id === 'hsf-001' ? coffeeShopTemplate : template_id === 'cs-001' ? travelTemplate : template_id === 'rec-001' ? hospitalTemplate : template_id === 'ins-001' ? insuranceTemplate : insuranceTemplate);
+    useChatbotStore.setState(template_id === 'hsf-001' ? tshirtStoreTemplate : template_id === 'cs-001' ? coffeeTeaSpicesTemplate : template_id === 'rec-001' ? organicProductsTemplate : organicProductsTemplate);
     router.push(`/createchatbot`);
   };
 

@@ -18,7 +18,8 @@ const MessageFormatter: React.FC<MessageFormatterProps> = ({ message }) => {
         const items = paragraph
           .split(/\n/)
           .filter(line => line.trim())
-          .map(line => line.replace(/^\d+\.\s*/, '').trim());
+          .map(line => line.replace(/^\d+\.\s*/, '').trim())
+          .filter(item => item.length > 0); // Only include non-empty items
 
         return (
           <ol key={`p-${pIndex}`} className="my-3 pl-6 list-decimal">
@@ -36,7 +37,8 @@ const MessageFormatter: React.FC<MessageFormatterProps> = ({ message }) => {
         const items = paragraph
           .split(/\n/)
           .filter(line => line.match(/^[\*\-]/))
-          .map(line => line.replace(/^[\*\-]\s*/, '').trim());
+          .map(line => line.replace(/^[\*\-]\s*/, '').trim())
+          .filter(item => item.length > 0); // Only include non-empty items
 
         return (
           <ul key={`p-${pIndex}`} className="my-3 pl-6 list-disc">
@@ -65,30 +67,33 @@ const MessageFormatter: React.FC<MessageFormatterProps> = ({ message }) => {
     const segments = [];
     let currentIndex = 0;
 
-    // Regular expression for matching links
+    // Regular expression for matching complete links only
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
     let match;
 
     while ((match = linkRegex.exec(text)) !== null) {
-      // Add text before the link
-      if (match.index > currentIndex) {
-        segments.push(formatBasicText(text.slice(currentIndex, match.index)));
+      // Only process complete links (both brackets and parentheses are complete)
+      if (match[1] && match[2]) {
+        // Add text before the link
+        if (match.index > currentIndex) {
+          segments.push(formatBasicText(text.slice(currentIndex, match.index)));
+        }
+
+        // Add the link
+        segments.push(
+          <a
+            key={`link-${match.index}`}
+            href={match[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {match[1]}
+          </a>
+        );
+
+        currentIndex = match.index + match[0].length;
       }
-
-      // Add the link
-      segments.push(
-        <a
-          key={`link-${match.index}`}
-          href={match[2]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
-        >
-          {match[1]}
-        </a>
-      );
-
-      currentIndex = match.index + match[0].length;
     }
 
     // Add remaining text
@@ -103,16 +108,20 @@ const MessageFormatter: React.FC<MessageFormatterProps> = ({ message }) => {
     return text
       .split(/(\*\*[^*]+\*\*|\*[^*]+\*|__[^_]+__|_[^_]+_)/g)
       .map((segment, index) => {
-        if (segment.startsWith('**') && segment.endsWith('**')) {
+        // Handle complete bold formatting
+        if (segment.startsWith('**') && segment.endsWith('**') && segment.length > 4) {
           return <strong key={index}>{segment.slice(2, -2)}</strong>;
         }
-        if (segment.startsWith('*') && segment.endsWith('*')) {
+        // Handle complete italic formatting
+        if (segment.startsWith('*') && segment.endsWith('*') && segment.length > 2 && !segment.startsWith('**')) {
           return <em key={index}>{segment.slice(1, -1)}</em>;
         }
-        if (segment.startsWith('__') && segment.endsWith('__')) {
+        // Handle complete bold formatting with underscores
+        if (segment.startsWith('__') && segment.endsWith('__') && segment.length > 4) {
           return <strong key={index}>{segment.slice(2, -2)}</strong>;
         }
-        if (segment.startsWith('_') && segment.endsWith('_')) {
+        // Handle complete italic formatting with underscores
+        if (segment.startsWith('_') && segment.endsWith('_') && segment.length > 2 && !segment.startsWith('__')) {
           return <em key={index}>{segment.slice(1, -1)}</em>;
         }
         return segment;

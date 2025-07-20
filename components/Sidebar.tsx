@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { cn } from "../lib/utils";
 import Link, { LinkProps } from "next/link";
-import React, { useState, createContext, useContext, useEffect, useCallback } from "react";
+import React, { useState, createContext, useContext, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Logo from "./Logo";
 import {
@@ -33,7 +33,6 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
-import { debounce } from "lodash";
 
 // Move the user email logic to a separate component
 const UserEmailDisplay = () => {
@@ -78,19 +77,19 @@ export function SidebarLayout({
       ),
     },
     {
-      label: "Build New Chatbot", 
+      label: "Build New Agent", 
       href: "/createchatbot",
       icon: (
         <IconTool className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
     },
-    {
-      label: "Chatbots",
-      href: "/testchatbot", 
-      icon: (
-        <IconMessage2Code className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-      ),
-    },
+    // {
+    //   label: "Chatbots",
+    //   href: "/testchatbot", 
+    //   icon: (
+    //     <IconMessage2Code className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+    //   ),
+    // },
     {
       label: "Deployment",
       href: "/deploychatbot",
@@ -105,13 +104,13 @@ export function SidebarLayout({
         <IconInbox  className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
       ),
     },
-    {
-      label: "Leads",
-      href: "/leads",
-      icon: (
-        <IconUserPlus  className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-      ),
-    },
+    // {
+    //   label: "Leads",
+    //   href: "/leads",
+    //   icon: (
+    //     <IconUserPlus  className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
+    //   ),
+    // },
     {
       label: "Integrations",
       href: "/dataintegrations",
@@ -204,8 +203,6 @@ export function SidebarLayout({
     );
   };
 
-
-
   // Update currentPath when the component mounts
   React.useEffect(() => {
     setCurrentPath(window.location.pathname);
@@ -217,7 +214,7 @@ export function SidebarLayout({
       "h-screen",
       className
     )}>
-            <div className="md:hidden p-4 bg-slate-150 border-b">
+      <div className="md:hidden p-4 bg-slate-150 border-b">
         <button 
           onClick={() => setIsMobileMenuOpen(true)}
           className="p-2 hover:bg-slate-150 rounded-md"
@@ -231,23 +228,36 @@ export function SidebarLayout({
         {isMobileMenuOpen && <MobileNav />}
       </AnimatePresence>
 
-
       {/* Desktop Sidebar */}
       <div className="h-full relative hidden md:block">
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="flex flex-col h-full">
-            {/* Top Section with Scrollable Content */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Header with Logo and Toggle Button */}
+            <div className="flex items-center justify-between px-2 py-4 border-b border-gray-200 flex-shrink-0">
               <Logo showText={open} />
-              <div className="mt-8 flex flex-col">
-                {primaryLinks.map((link, idx) => (
-                  <SidebarLink key={idx} link={link} />
-                ))}
-              </div>
+              <button
+                onClick={() => setOpen(!open)}
+                className="p-2 hover:bg-gray-200 rounded-md transition-colors flex-shrink-0"
+                title={open ? "Collapse sidebar" : "Expand sidebar"}
+              >
+                <IconArrowNarrowLeft 
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    open ? "rotate-0" : "rotate-180"
+                  )} 
+                />
+              </button>
             </div>
 
-            {/* Fixed Bottom Section */}
-            <div className="absolute bottom-0 left-4 right-0 bg-inherit pb-4">
+            {/* Navigation Links - This will take up remaining space */}
+            <div className="flex-1 px-2 py-4 flex flex-col space-y-1 overflow-y-auto">
+              {primaryLinks.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
+            </div>
+
+            {/* Bottom Section - This will stick to the bottom */}
+            <div className="px-2 py-4 border-t border-gray-200 flex-shrink-0 space-y-1">
               <SidebarLink
                 link={{
                   label: <UserEmailDisplay />,
@@ -273,8 +283,6 @@ export function SidebarLayout({
     </div>
   );
 }
-
-
 
 interface Links {
   label: string | React.ReactNode;
@@ -312,9 +320,9 @@ export const SidebarProvider = ({
     const [openState, setOpenState] = useState(() => {
       if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('sidebarState');
-        return saved ? JSON.parse(saved) : true; // Default to true if no saved state
+        return saved ? JSON.parse(saved) : true; // Default to true (open)
       }
-      return true;
+      return true; // Default to true (open)
     });
   
     // Update localStorage when state changes
@@ -365,33 +373,6 @@ export const DesktopSidebar = ({
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen } = useSidebar();
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Move the debounced function outside useCallback
-  const debouncedOpenFn = (value: boolean) => {
-    setOpen(value);
-  };
-
-  const debouncedOpen = useCallback(
-    debounce(debouncedOpenFn, 500),
-    [setOpen]
-  );
-
-  useEffect(() => {
-    if (isHovered) {
-      debouncedOpen(true);
-    }
-    
-    return () => {
-      debouncedOpen.cancel();
-    };
-  }, [isHovered, debouncedOpen]);
-
-  const handleMouseLeave = () => {
-    debouncedOpen.cancel();
-    setIsHovered(false);
-    setOpen(false);
-  };
 
   return (
     <motion.div
@@ -400,47 +381,16 @@ export const DesktopSidebar = ({
         "border-r border-gray-200 shadow-lg",
         className
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
       animate={{
-        width: open ? "300px" : "70px",
+        width: open ? "300px" : "80px",
       }}
       transition={{
-        duration: 0.8, // Slower width animation
-        ease: [0.4, 0, 0.2, 1] // Smooth easing function
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1]
       }}
       {...props}
     >
-      <AnimatePresence mode="wait">
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: 0.6, // Slower opacity animation
-              ease: "easeInOut"
-            }}
-            className="w-full"
-          >
-            {children}
-          </motion.div>
-        )}
-        {!open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: 0.6, // Slower opacity animation
-              ease: "easeInOut"
-            }}
-            className="w-full"
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {children}
     </motion.div>
   );
 };
@@ -448,17 +398,15 @@ export const DesktopSidebar = ({
 export const SidebarLink = ({
   link,
   className,
-  ...props // Accept additional props
+  ...props
 }: {
   link: Links;
   className?: string;
   props?: LinkProps;
 }) => {
-  // Move hooks to the top level - no conditional execution
   const context = useSidebar();
   const pathname = usePathname();
   
-  // Handle case where context is missing
   if (!context) {
     console.error("SidebarLink must be used within a SidebarProvider");
     return null;
@@ -573,82 +521,3 @@ const MobileSidebarContent = ({
     </motion.div>
   );
 };
-
-  // export function CollapsibleSidebar() {
-  //   return (
-  //     <SidebarLayout>
-  //       <Dashboard />
-  //     </SidebarLayout>
-  //   );
-  // }
-
-
-// Dummy dashboard component with content
-// const Dashboard = () => {
-//   return (
-//     <div className="m-2 flex flex-1">
-//       <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-2xl border border-neutral-200 bg-white p-2  md:p-10">
-//         <div className="flex gap-2">
-//           {[...new Array(4)].map((_, i) => (
-//             <div
-//               key={"first-array" + i}
-//               className="h-20 w-full animate-pulse rounded-lg bg-gray-100 "
-//             ></div>
-//           ))}
-//         </div>
-//         <div className="flex flex-1 gap-2">
-//           {[...new Array(2)].map((_, i) => (
-//             <div
-//               key={"second-array" + i}
-//               className="h-full w-full animate-pulse rounded-lg bg-gray-100 "
-//             ></div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// {
-//   label: "Build New Chatbot",
-//   href: "/createchatbot",
-//   icon: (
-//     <IconTool className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-//   ),
-// },
-// {
-//   label: "Chatbots",
-//   href: "/testchatbot",
-//   icon: (
-//     <IconMessage2Code className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-//   ),
-// },
-// {
-//   label: "Deployment",
-//   href: "#",
-//   icon: (
-//     <IconRocket className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-//   ),
-// },
-// {
-//   label: "Inbox",
-//   href: "/chatbotmessages",
-//   icon: (
-//     <IconInbox className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-//   ),
-// },
-// {
-//   label: "Integrations",
-//   href: "#",
-//   icon: (
-//     <IconApi className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-//   ),
-// },
-
-// {
-//   label: "Resources",
-//   href: "#",
-//   icon: (
-//     <IconBook className="h-5 w-5 flex-shrink-0 text-neutral-700 " />
-//   ),
-// }

@@ -29,22 +29,40 @@ interface ProductsData {
   };
 }
 
-const ProductsTable = () => {
+interface Integration {
+  id: string;
+  shop: string;
+  platform: string;
+  status: 'none' | 'pending' | 'successful' | 'error';
+  created_at: string;
+}
+
+interface ShopifyProductsProps {
+  integration?: Integration;
+}
+
+const ProductsTable: React.FC<ShopifyProductsProps> = ({ integration }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [shopUrl, setShopUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log('fetching products')
+    if (!integration) {
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('fetching products for integration:', integration.shop)
     const user = localStorage.getItem('user')
     console.log(user)
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/shopify_products/${user}/`, {
+        const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/shopify_products/${user}/${integration.id}/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ shop: integration.shop })
         });
 
         const data: ProductsData = await response.json();
@@ -59,7 +77,17 @@ const ProductsTable = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [integration]);
+
+  if (!integration) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">Please select an integration to view products</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -73,7 +101,7 @@ const ProductsTable = () => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <p className="text-xl text-gray-600">No Products found for this shopify account</p>
+          <p className="text-xl text-gray-600">No Products found for {integration.shop}</p>
         </div>
       </div>
     );
@@ -81,7 +109,7 @@ const ProductsTable = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Products Catalog</h2>
+      <h2 className="text-2xl font-bold mb-6">Products Catalog - {integration.shop}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <Card key={product.id} className="overflow-hidden">

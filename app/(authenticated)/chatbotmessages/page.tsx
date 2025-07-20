@@ -9,6 +9,181 @@ import { Button } from "../../../components/ui/Button";
 import { Bot, Users } from 'lucide-react';
 import ChatSkeleton from '../../../components/Chatskeleton';
 
+// Custom MessageFormatter for chat messages (without background styling)
+const ChatMessageFormatter: React.FC<{ message: string }> = ({ message }) => {
+  const formatContent = (text: string) => {
+    // Check for code blocks first (triple backticks)
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      // Add text before the code block
+      if (match.index > lastIndex) {
+        const beforeText = text.slice(lastIndex, match.index);
+        parts.push({ type: 'text', content: beforeText });
+      }
+
+      // Add the code block
+      parts.push({ type: 'code', content: match[1] });
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push({ type: 'text', content: text.slice(lastIndex) });
+    }
+
+    return parts.map((part, pIndex) => {
+      if (part.type === 'code') {
+        return (
+          <pre key={`code-${pIndex}`} className="my-2 p-2 bg-gray-100 rounded text-sm font-mono overflow-x-auto">
+            <code>{part.content}</code>
+          </pre>
+        );
+      }
+
+      // Process text content
+      const text = part.content;
+      // Split text into paragraphs
+      const paragraphs = text.split(/\n(?!\d+\.|\*|\-)/);
+      
+      return paragraphs.map((paragraph, paraIndex) => {
+        if (!paragraph.trim()) return null;
+
+        // Check if this is a list block
+        if (paragraph.match(/^\d+\./m)) {
+          // Split into list items while preserving the content
+          const items = paragraph
+            .split(/\n/)
+            .filter(line => line.trim())
+            .map(line => line.replace(/^\d+\.\s*/, '').trim())
+            .filter(item => item.length > 0);
+
+          return (
+            <ol key={`p-${pIndex}-${paraIndex}`} className="my-1 pl-4 list-decimal">
+              {items.map((item, index) => (
+                <li key={`item-${index}`} className="my-0.5">
+                  {formatText(item)}
+                </li>
+              ))}
+            </ol>
+          );
+        }
+
+        // Check for bullet lists
+        if (paragraph.match(/^[\*\-]/m)) {
+          const items = paragraph
+            .split(/\n/)
+            .filter(line => line.match(/^[\*\-]/))
+            .map(line => line.replace(/^[\*\-]\s*/, '').trim())
+            .filter(item => item.length > 0);
+
+          return (
+            <ul key={`p-${pIndex}-${paraIndex}`} className="my-1 pl-4 list-disc">
+              {items.map((item, index) => (
+                <li key={`item-${index}`} className="my-0.5">
+                  {formatText(item)}
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        // Regular paragraph
+        return (
+          <p key={`p-${pIndex}-${paraIndex}`} className="my-1">
+            {formatText(paragraph)}
+          </p>
+        );
+      });
+    }).flat().filter(Boolean);
+  };
+
+  const formatText = (text: string) => {
+    if (!text) return null;
+    
+    // Split text into segments that might contain special formatting
+    const segments = [];
+    let currentIndex = 0;
+
+    // Regular expression for matching complete links only
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      // Only process complete links (both brackets and parentheses are complete)
+      if (match[1] && match[2]) {
+        // Add text before the link
+        if (match.index > currentIndex) {
+          segments.push(formatBasicText(text.slice(currentIndex, match.index)));
+        }
+
+        // Add the link
+        segments.push(
+          <a
+            key={`link-${match.index}`}
+            href={match[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {match[1]}
+          </a>
+        );
+
+        currentIndex = match.index + match[0].length;
+      }
+    }
+
+    // Add remaining text
+    if (currentIndex < text.length) {
+      segments.push(formatBasicText(text.slice(currentIndex)));
+    }
+
+    return segments;
+  };
+
+  const formatBasicText = (text: string) => {
+    return text
+      .split(/(\*\*[^*]+\*\*|\*[^*]+\*|__[^_]+__|_[^_]+_|`[^`]+`)/g)
+      .map((segment, index) => {
+        // Handle complete bold formatting
+        if (segment.startsWith('**') && segment.endsWith('**') && segment.length > 4) {
+          return <strong key={index}>{segment.slice(2, -2)}</strong>;
+        }
+        // Handle complete italic formatting
+        if (segment.startsWith('*') && segment.endsWith('*') && segment.length > 2 && !segment.startsWith('**')) {
+          return <em key={index}>{segment.slice(1, -1)}</em>;
+        }
+        // Handle complete bold formatting with underscores
+        if (segment.startsWith('__') && segment.endsWith('__') && segment.length > 4) {
+          return <strong key={index}>{segment.slice(2, -2)}</strong>;
+        }
+        // Handle complete italic formatting with underscores
+        if (segment.startsWith('_') && segment.endsWith('_') && segment.length > 2 && !segment.startsWith('__')) {
+          return <em key={index}>{segment.slice(1, -1)}</em>;
+        }
+        // Handle inline code
+        if (segment.startsWith('`') && segment.endsWith('`') && segment.length > 2) {
+          return (
+            <code key={index} className="bg-gray-200 px-1 py-0.5 rounded text-sm font-mono">
+              {segment.slice(1, -1)}
+            </code>
+          );
+        }
+        return segment;
+      });
+  };
+
+  return (
+    <div className="space-y-0">
+      {formatContent(message)}
+    </div>
+  );
+};
+
 const ChatbotListSkeleton: React.FC = () => {
   // Simulate an array to match the expected chatbots list
   const skeletonChatbots = Array(2).fill(null);
@@ -364,7 +539,9 @@ const ChatbotMessagesPage = () => {
                           }`}
                         >
                           <p className="text-sm font-medium mb-1">{message.sender}</p>
-                          <p className="text-sm">{message.content}</p>
+                          <div className="text-sm">
+                            <ChatMessageFormatter message={message.content} />
+                          </div>
                           <p className="text-xs text-gray-500 mt-1">
                             {new Date(message.message_time).toLocaleDateString([], {
                               month: 'short',

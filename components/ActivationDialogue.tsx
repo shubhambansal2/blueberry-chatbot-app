@@ -150,7 +150,7 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
       )}
       
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-        <AlertDialogTrigger asChild>
+        {/* <AlertDialogTrigger asChild>
           <button 
             disabled={!isValid || externalLoading || isActivating}
             className={`px-4 py-2 text-white rounded-md transition-colors flex items-center justify-center space-x-2 ${
@@ -163,7 +163,7 @@ const ActivationDialog = ({ isValid, isLoading: externalLoading }: ActivationDia
             {externalLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>{externalLoading ? 'Activating...' : 'One-Click Activation'}</span>
           </button>
-        </AlertDialogTrigger>
+        </AlertDialogTrigger> */}
         
         <AlertDialogContent className="bg-white">
           <AlertDialogHeader>

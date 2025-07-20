@@ -13,7 +13,8 @@ import {
   Paintbrush,
   Check,
   Copy,
-  LifeBuoy
+  LifeBuoy,
+  ExternalLink
 } from 'lucide-react';
 
 const websitePlatforms = [
@@ -285,11 +286,21 @@ const CodeBlock = ({ code }: { code: string }) => {
 };
 
 
+interface Integration {
+  id: string;
+  shop: string;
+  platform: string;
+  created_at: string;
+}
+
 const PlatformIntegration = () => {
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('Shopify');
   const [selectedChatbot, setSelectedChatbot] = useState<Chatbot | null>(null);
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
+  const [isLoadingIntegration, setIsLoadingIntegration] = useState(false);
+  const [shopName, setShopName] = useState('');
 
    // Simulate fetching chatbots from backend
   const getChatbots = async () => {
@@ -297,8 +308,60 @@ const PlatformIntegration = () => {
       const chatbots = await fetchChatbots();
       setIsLoading(false);
       setChatbots(chatbots);
+      // Auto-select the first chatbot if available
+      if (chatbots.length > 0) {
+        setSelectedChatbot(chatbots[0]);
+      }
     } catch (error) {
       console.error('Error fetching chatbots:', error);
+    }
+  };
+
+  // Fetch integration data for selected chatbot
+  const fetchIntegrationForChatbot = async (chatbot: Chatbot) => {
+    setIsLoadingIntegration(true);
+    try {
+      // First, get the chatbot details to check if it has an integration_id
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/chatbots/${chatbot.chatbot_id}/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch chatbot details');
+      }
+
+      const chatbotData = await response.json();
+      
+      // If chatbot has integration_id, fetch the integration details
+      if (chatbotData.integration_id) {
+        const user = localStorage.getItem('user');
+        if (user) {
+          const integrationResponse = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/get_dataintegrations/${user}/`);
+          const integrationData = await integrationResponse.json();
+          
+          if (integrationResponse.ok && integrationData.dataintegrations?.length > 0) {
+            const integration = integrationData.dataintegrations.find((int: any) => int.id === chatbotData.integration_id);
+            if (integration) {
+              setSelectedIntegration({
+                id: integration.id,
+                shop: integration.shop,
+                platform: 'Shopify',
+                created_at: integration.created_at || new Date().toISOString()
+              });
+            }
+          }
+        }
+      } else {
+        setSelectedIntegration(null);
+      }
+    } catch (error) {
+      console.error('Error fetching integration:', error);
+      setSelectedIntegration(null);
+    } finally {
+      setIsLoadingIntegration(false);
     }
   };
 
@@ -306,6 +369,15 @@ const PlatformIntegration = () => {
     getChatbots();
     console.log(chatbots);
   }, []);
+
+  // Fetch integration when chatbot is selected
+  useEffect(() => {
+    if (selectedChatbot) {
+      fetchIntegrationForChatbot(selectedChatbot);
+    } else {
+      setSelectedIntegration(null);
+    }
+  }, [selectedChatbot]);
 
   const getWidgetCode = () => {
     if (!selectedChatbot) return '';
@@ -321,6 +393,24 @@ const PlatformIntegration = () => {
         apiKey: '${selectedChatbot.api_key}'
     });
 </script>`;
+  };
+
+  const handleShopifyDeploy = () => {
+    if (selectedIntegration?.shop) {
+      const shopname = selectedIntegration.shop.split('.')[0];
+      console.log(shopname);
+      // Construct the Shopify admin URL for theme editor
+      const shopifyAdminUrl = `https://admin.shopify.com/store/${shopname}/themes/current/editor?context=apps`;
+      window.open(shopifyAdminUrl, '_blank');
+    }
+  };
+
+  const handleShopifyAppEmbed = () => {
+    // Redirect to Shopify app embed page for the selected chatbot
+    if (selectedChatbot) {
+      const shopifyEmbedUrl = `https://admin.shopify.com/store/${shopName}/themes/current/editor?context=apps`;
+      window.open(shopifyEmbedUrl, '_blank');
+    }
   };
 
   return (
@@ -348,7 +438,7 @@ const PlatformIntegration = () => {
 
         {/* Chatbot Selection */}
         <div className="w-full md:w-64 border-b md:border-b-0 md:border-r px-2 md:px-4 pb-4 md:pb-0 mb-4 md:mb-0">
-          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Select Chatbot</h3>
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Select Agent</h3>
           {isLoading ? (
             <div className="flex items-center justify-center h-24 md:h-32 text-muted-foreground">
               Loading chatbots...
@@ -385,21 +475,102 @@ const PlatformIntegration = () => {
                 </p>
               )}
               
-              {/* Platform-specific instructions */}
-              <div className="mb-4 md:mb-6">
-                {websitePlatforms.find(p => p.name === selectedPlatform)?.instructions.map((instruction, index) => (
-                  <p key={index} className="mb-2 text-sm md:text-base">
-                    {instruction}
-                  </p>
-                ))}
-              </div>
-
-              {/* Code block */}
-              {selectedPlatform !== 'Need Help?' && (
-                <div className="mb-4 md:mb-6">
-                  <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Integration Code</h4>
-                  <CodeBlock code={getWidgetCode()} />
+              {/* Shopify Platform - Special handling */}
+              {selectedPlatform === 'Shopify' ? (
+                <div>
+                  {isLoadingIntegration ? (
+                    // Loading state for integration
+                    <div className="mb-4 md:mb-6">
+                      <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Quick Deploy</h4>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                          <span className="ml-2 text-sm text-gray-600">Checking for connected stores...</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : selectedIntegration ? (
+                    // Quick deploy option for connected stores
+                    <div className="mb-4 md:mb-6">
+                      <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Quick Deploy</h4>
+                      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-emerald-800 mb-1">
+                              Connected Store: {selectedIntegration.shop}
+                            </p>
+                            <p className="text-xs text-emerald-600">
+                              Click below to open your Shopify theme editor and add the widget
+                            </p>
+                          </div>
+                          <button
+                            onClick={handleShopifyDeploy}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            Deploy to Shopify
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // App embed option for non-connected stores
+                    <div className="mb-4 md:mb-6">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex flex-col gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-blue-800 mb-1">
+                              Enter your Shopify store name
+                            </p>
+                            <p className="text-xs text-blue-600">
+                              For example: neo-balance-shoes.myshopify.com
+                            </p>
+                            <input 
+                              type="text"
+                              placeholder="your-store-name"
+                              className="mt-2 w-full px-3 py-2 border border-blue-200 rounded-lg text-sm"
+                              onChange={(e) => setShopName(e.target.value)}
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => {
+                                if (shopName) {
+                                  const shopName1 = shopName.split('.')[0];
+                                  window.location.href = `https://admin.shopify.com/store/${shopName1}/themes/current/editor?context=apps`;
+                                }
+                              }}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Continue to App Embed
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
+              ) : (
+                // Other platforms - show instructions and code
+                <>
+                  {/* Platform-specific instructions */}
+                  <div className="mb-4 md:mb-6">
+                    {websitePlatforms.find(p => p.name === selectedPlatform)?.instructions.map((instruction, index) => (
+                      <p key={index} className="mb-2 text-sm md:text-base">
+                        {instruction}
+                      </p>
+                    ))}
+                  </div>
+
+                  {/* Code block */}
+                  {selectedPlatform !== 'Need Help?' && (
+                    <div className="mb-4 md:mb-6">
+                      <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Integration Code</h4>
+                      <CodeBlock code={getWidgetCode()} />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           ) : (

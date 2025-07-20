@@ -14,6 +14,7 @@ import ActivationForm from '@components/edit forms/ActivationForm';
 import { useBrowserNavigationGuard } from '../../../../lib/useNavigationGuard';
 import LeaveDialog from '@components/EditbotDialogue';
 import ActivationDialogue_Edit from '@components/ActivationDialogue_Edit';
+import ChatbotTypeForm from '@components/edit forms/ChatbotType';
 
 import {
   IconMessageChatbot,
@@ -73,7 +74,34 @@ const fetchChatbotData = async (id: string) => {
   
   const chatbotData = await response.json();
   
+  // Fetch integration information if integration_id exists
+  let selectedIntegration = null;
+  if (chatbotData.integration_id) {
+    try {
+      const user = localStorage.getItem('user');
+      if (user) {
+        const integrationResponse = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/get_dataintegrations/${user}/`);
+        const integrationData = await integrationResponse.json();
+        
+        if (integrationResponse.ok && integrationData.dataintegrations?.length > 0) {
+          const integration = integrationData.dataintegrations.find((int: any) => int.id === chatbotData.integration_id);
+          if (integration) {
+            selectedIntegration = {
+              id: integration.id,
+              shop: integration.shop,
+              platform: 'Shopify', // Assuming all integrations are Shopify
+              created_at: integration.created_at || new Date().toISOString()
+            };
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching integration:', error);
+    }
+  }
+  
   return {
+    agentType: chatbotData.is_product_recommender ? 'sales' : 'support',
     companyDetails: {
       companyName: chatbotData.company_name,
       industry: chatbotData.company_industry,
@@ -101,18 +129,29 @@ const fetchChatbotData = async (id: string) => {
         file: new File([pdf.data], pdf.url.split('/').pop() || 'document.pdf', { type: 'application/pdf' }),
         preview: pdf.url,
         source_id: pdf.id  // Include the source_id in documents
-      }))
+      })),
+      selectedIntegration: selectedIntegration
     }
   };
 };
 
 // Mock API call to update chatbot
 const updateChatbot = async (id: string, data: any) => {
+  const state = editChatbotStore.getState();
+  const payload = {
+    ...data,
+    agentType: state.agentType,
+    selectedIntegration: state.dataSources.selectedIntegration,
+    // include other fields as needed
+  };
   await new Promise(resolve => setTimeout(resolve, 1500));
+  // Replace with actual API call:
+  // await fetch(`/api/chatbots/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
   return { success: true };
 };
 
 const formComponents: Record<string, React.FC> = {
+  'agent_type': ChatbotTypeForm,
   'company-details': CompanyDetailsForm,
   'data-sources': DataSourcesForm,
   'chatbot-details': ChatbotDetailsForm,
@@ -225,23 +264,35 @@ const EditChatbotPage = () => {
         const data = await fetchChatbotData(chatbotId);
 
         // Update store with mock data
+        // AGENT TYPE
+        if (data.agentType === 'sales') {
+          editChatbotStore.getState().updateAgentType({ isSalesAgent: true, isSupportAgent: false });
+        } else {
+          editChatbotStore.getState().updateAgentType({ isSalesAgent: false, isSupportAgent: true });
+        }
         updateCompanyDetails(data.companyDetails);
         updateChatbotDetails(data.chatbotDetails);
         updateSpecialInstructions(data.specialInstructions);
         updateDataSources(data.dataSources);
-  
-
         setIsLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
         setIsLoading(false);
       }
     };
-
     loadChatbotData();
   }, [params.slug, updateCompanyDetails, updateChatbotDetails, updateSpecialInstructions, updateDataSources, updateActivation, updateDeployment]); 
 
   const items = [
+    {
+      id: "agent_type",
+      title: "Agent Functionality",
+      details: "Select the type of agent you want to build",
+      icon: (
+        <IconDatabase className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+      ),
+      href: "#agent_type",
+    },
     {
       id: "chatbot-details",
       title: "Chatbot Details", 
@@ -298,7 +349,7 @@ const EditChatbotPage = () => {
   
   
 
-  const [selectedId, setSelectedId] = useState<string>("chatbot-details");
+  const [selectedId, setSelectedId] = useState<string>("agent_type");
   const CurrentForm = selectedId ? formComponents[selectedId] : null;
 
   

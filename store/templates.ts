@@ -25,11 +25,11 @@ const chatbotColors = {
 };
 
 // E-commerce Coffee Shop Template
-export const coffeeShopTemplate: Partial<ChatbotState> = {
+export const coffeeTeaSpicesTemplate: Partial<ChatbotState> = {
   companyDetails: {
     companyName: 'Bean & Brew Co.',
     industry: 'Food & Beverage',
-    companyDetails: 'Artisanal coffee shop specializing in single-origin beans and craft brewing methods.',
+    companyDetails: 'Coffee, Tea and Spices sourced from the natural coffee estates around the world',
     logo: null
   },
   chatbotDetails: {
@@ -42,12 +42,11 @@ export const coffeeShopTemplate: Partial<ChatbotState> = {
   },
   specialInstructions: {
     specialinstructions: `
-- Provide detailed information about coffee origins and brewing methods
-- Help customers choose coffee based on their taste preferences
-- Guide customers through the ordering process
-- Answer questions about coffee preparation and storage
-- Handle order status inquiries and delivery tracking
-- Provide loyalty program information and point balance checks`,
+Provide information about the products and services offered by the company.
+Answer questions about the products and services offered by the company.
+Guide customers through the ordering process.
+Handle order status inquiries and delivery tracking.
+Provide loyalty program information and point balance checks.`,
     exampleresponses: [
       {
         question: "What's the difference between light and dark roast coffee?",
@@ -78,46 +77,46 @@ export const coffeeShopTemplate: Partial<ChatbotState> = {
 };
 
 // Online Travel Platform Template
-export const travelTemplate: Partial<ChatbotState> = {
+export const tshirtStoreTemplate: Partial<ChatbotState> = {
   companyDetails: {
-    companyName: 'Wanderlust Adventures',
-    industry: 'Travel & Tourism',
-    companyDetails: 'Online travel platform offering flights, accommodations, and experience bookings worldwide.',
+    companyName: 'ThreadCraft Tees',
+    industry: 'Retail & Fashion',
+    companyDetails: 'Premium custom t-shirt store offering high-quality designs, custom printing, and personalized apparel.',
     logo: null
   },
   chatbotDetails: {
-    name: 'Journey Guide',
-    personality: 'Enthusiastic, helpful, and well-traveled',
-    description: 'Your personal travel planning assistant',
+    name: 'Style Guide',
+    personality: 'Friendly, fashion-savvy, and helpful',
+    description: 'Your personal t-shirt shopping assistant',
     primaryLanguage: 'English',
     color: chatbotColors.travel,
     avatar: null
   },
   specialInstructions: {
     specialinstructions: `
-- Assist with flight and hotel bookings
-- Provide destination information and travel tips
-- Handle booking modifications and cancellations
-- Answer questions about travel insurance
-- Provide real-time flight status updates
-- Guide users through the booking process
-- Offer personalized travel recommendations`,
+- Help customers find t-shirts based on style, size and design preferences
+- Provide sizing guidance and measurements
+- Answer questions about materials and care instructions
+- Handle order status inquiries and tracking
+- Process returns and exchanges
+- Guide users through the custom design process
+- Offer recommendations based on customer preferences`,
     exampleresponses: [
       {
-        question: "What's your cancellation policy for hotel bookings?",
-        answer: "Our cancellation policy varies by property, but I can check the specific policy for your booking. Generally, most hotels offer free cancellation up to 24-48 hours before check-in. Could you please provide your booking reference number, and I'll check the exact terms for you?"
+        question: "What's your return policy?",
+        answer: "We offer hassle-free returns within 30 days of purchase for unworn items with tags attached. I can help you start a return right now - would you like me to walk you through the process? Just have your order number ready and I'll guide you through each step."
       },
       {
-        question: "Can you recommend activities in Barcelona for a family with kids?",
-        answer: "Barcelona is great for families! I'd recommend visiting Park Güell for its whimsical architecture and open spaces, the Barcelona Aquarium, and the Magic Fountain show at Montjuïc. The hop-on-hop-off bus tour is also family-friendly and a great way to see the city. Would you like me to check availability and prices for any of these activities for your specific dates?"
+        question: "Can you help me find the right size?",
+        answer: "I'd be happy to help you find the perfect fit! Our t-shirts are true to size, but I can provide exact measurements for any specific style. Could you tell me your usual t-shirt size and if you prefer a fitted or relaxed fit? I can then recommend the best size and share our detailed size chart for precise measurements."
       }
     ]
   },
   dataSources: {
     websites: [
-      // { value: 'https://wanderlustadventures.com/destinations' },
-      // { value: 'https://wanderlustadventures.com/travel-guides' },
-      // { value: 'https://wanderlustadventures.com/booking-help' }
+      // { value: 'https://threadcrafttees.com/designs' },
+      // { value: 'https://threadcrafttees.com/size-guide' },
+      // { value: 'https://threadcrafttees.com/custom-orders' }
     ],
     documents: []
   },
@@ -125,53 +124,54 @@ export const travelTemplate: Partial<ChatbotState> = {
     platform: 'web',
     configuration: {
       position: 'bottom-right',
-      initialMessage: "✈️ Welcome to Wanderlust Adventures! Ready to plan your next journey?",
+      initialMessage: "👕 Welcome to ThreadCraft Tees! How can I help you find your perfect t-shirt today?",
       theme: 'light'
     }
   }
 };
 
 // Hospital Appointments Template
-export const hospitalTemplate: Partial<ChatbotState> = {
+export const organicProductsTemplate: Partial<ChatbotState> = {
   companyDetails: {
-    companyName: 'HealthCare Plus',
-    industry: 'Healthcare',
-    companyDetails: 'Modern healthcare facility providing comprehensive medical services and specialized care.',
+    companyName: 'Nature\'s Bounty',
+    industry: 'Retail',
+    companyDetails: 'Premium organic and natural products store offering sustainably sourced food, personal care, and household items.',
     logo: null
   },
   chatbotDetails: {
-    name: 'CareConnect',
-    personality: 'Professional, compassionate, and clear',
-    description: 'Your healthcare scheduling assistant',
+    name: 'EcoGuide',
+    personality: 'Knowledgeable, eco-conscious, and helpful',
+    description: 'Your natural products advisor',
     primaryLanguage: 'English',
     color: chatbotColors.hospital,
     avatar: null
   },
   specialInstructions: {
     specialinstructions: `
-- Schedule and manage medical appointments
-- Provide information about different medical departments
-- Answer basic insurance and payment questions
-- Guide patients through pre-appointment requirements
-- Handle emergency contact information
-- Provide directions and parking information
-- Connect patients with appropriate medical departments`,
+- Provide detailed product information and ingredients
+- Answer questions about organic certification and sourcing
+- Guide customers on product usage and benefits
+- Handle questions about allergens and dietary restrictions
+- Assist with order tracking and delivery
+- Provide storage and shelf-life information
+- Make personalized product recommendations
+- Explain eco-friendly packaging and practices`,
     exampleresponses: [
       {
-        question: "How do I schedule an appointment with a cardiologist?",
-        answer: "I can help you schedule an appointment with our cardiology department. First, could you tell me if this is a new patient consultation or a follow-up visit? Also, do you have a referral from your primary care physician? This will help me find the most appropriate appointment slot for you."
+        question: "What makes your products organic?",
+        answer: "Our products are certified organic by USDA standards, meaning they're grown without synthetic pesticides, fertilizers, or GMOs. Each product undergoes rigorous testing and certification. Would you like me to explain more about our certification process or help you find specific organic products?"
       },
       {
-        question: "What should I bring to my first appointment?",
-        answer: "For your first appointment, please bring: 1) A valid photo ID, 2) Your insurance card, 3) Any relevant medical records or test results, 4) A list of current medications, and 5) Your completed new patient forms (I can email these to you). Would you like me to send you the new patient forms now?"
+        question: "Do you have gluten-free options?",
+        answer: "Yes, we have an extensive range of gluten-free products! All our gluten-free items are clearly labeled and certified. Could you tell me what type of product you're looking for - snacks, baking ingredients, or prepared meals? I can help you find the perfect gluten-free options that match your needs."
       }
     ]
   },
   dataSources: {
     websites: [
-      // { value: 'https://healthcareplus.com/services' },
-      // { value: 'https://healthcareplus.com/patient-info' },
-      // { value: 'https://healthcareplus.com/departments' }
+      // { value: 'https://naturesbounty.com/products' },
+      // { value: 'https://naturesbounty.com/certifications' },
+      // { value: 'https://naturesbounty.com/sustainability' }
     ],
     documents: []
   },
@@ -179,7 +179,7 @@ export const hospitalTemplate: Partial<ChatbotState> = {
     platform: 'web',
     configuration: {
       position: 'bottom-right',
-      initialMessage: "👋 Welcome to HealthCare Plus. How may I assist you with your healthcare needs today?",
+      initialMessage: "🌱 Welcome to Nature's Bounty! How can I help you discover our organic products today?",
       theme: 'light'
     }
   }
