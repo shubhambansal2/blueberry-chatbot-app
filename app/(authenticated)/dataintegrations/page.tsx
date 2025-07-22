@@ -56,12 +56,9 @@ function DataIntegrations() {
     const handleShopUrlParam = async () => {
       const urlParams = new URLSearchParams(window.location.search)
       const shopParam = urlParams.get('shop')
-      
-      setShopParamInUrl(!!shopParam) // <-- Add this line to track if shop param exists
-      
+      setShopParamInUrl(!!shopParam)
+
       if (shopParam) {
-        console.log('🔗 Shop parameter detected:', shopParam)
-        
         const user = localStorage.getItem('user')
         if (!user) {
           toast({
@@ -72,62 +69,41 @@ function DataIntegrations() {
           return
         }
 
-        // Check if integration already exists
-        const existingIntegrations = integrations.filter(integration => integration.shop === shopParam)
-        if (existingIntegrations.length > 0) {
-          console.log('⚠️ Integration already exists for shop:', shopParam)
+        // 1. Fetch latest integrations from backend
+        let latestIntegrations = []
+        try {
+          const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/get_dataintegrations/${user}/`)
+          const data = await response.json()
+          latestIntegrations = data.dataintegrations || []
+        } catch (e) {
+          // handle error
+        }
+
+        // 2. Check if integration already exists
+        const exists = latestIntegrations.some((integration: any) => integration.shop === shopParam)
+        if (exists) {
           toast({
             title: "Info",
             description: "Shopify store is already connected!",
           })
-          // Do not remove the shop parameter from the URL
           return
         }
 
+        // 3. Create integration if not exists
         try {
           setLoading(true)
-          console.log('✅ Creating integration for shop:', shopParam)
-          
           const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/store_dataintegrations/${user}/`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ shop: shopParam })
           })
-
           if (!response.ok) throw new Error('Failed to store integration')
-
-          console.log('✅ Integration created successfully')
-
-          // Add the new integration to the local state immediately
-          // const newIntegration: Integration = {
-          //   id: Date.now().toString(), // Temporary ID
-          //   shop: shopParam,
-          //   platform: 'Shopify',
-          //   created_at: new Date().toISOString()
-          // }
-          // 
-          // setIntegrations(prev => [...prev, newIntegration])
-          // setSelectedIntegration(newIntegration)
-          
-          // Also refresh from server to get the real ID
           await checkExistingIntegrations()
-          // Optionally, setSelectedIntegration to the new integration if you can identify it from the refreshed list
-          const updatedIntegrations = integrations.filter(integration => integration.shop === shopParam)
-          if (updatedIntegrations.length > 0) {
-            setSelectedIntegration(updatedIntegrations[updatedIntegrations.length - 1])
-          }
-          
           toast({
             title: "Success",
             description: "Shopify store connected successfully!",
           })
-
-          // Do not remove the shop parameter from the URL
-
         } catch (error) {
-          console.error('❌ Error storing integration:', error)
           toast({
             variant: "destructive",
             title: "Error",
@@ -138,9 +114,8 @@ function DataIntegrations() {
         }
       }
     }
-
     handleShopUrlParam()
-  }, [integrations]) // Depend on integrations to ensure we have the latest data
+  }, []) // <--- Remove integrations from dependencies!
 
   // Cleanup processing flag on component unmount
   useEffect(() => {
@@ -579,16 +554,18 @@ function DataIntegrations() {
                     </div>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setIntegrationToDelete(integration)
-                          }}
-                        >
-                          <IconTrash size={16} />
-                        </Button>
+                        {!shopParamInUrl && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setIntegrationToDelete(integration)
+                            }}
+                          >
+                            <IconTrash size={16} />
+                          </Button>
+                        )}
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-white border border-gray-200 shadow-lg">
                         <AlertDialogHeader>
@@ -649,7 +626,7 @@ function DataIntegrations() {
              <Card>
                <CardHeader>
                  <CardTitle>Products</CardTitle>
-                 <CardDescription>View and manage your Shopify products from {selectedIntegration.shop}</CardDescription>
+                 {/* <CardDescription>View and manage your Shopify products from {selectedIntegration.shop}</CardDescription> */}
                </CardHeader>
                                <CardContent>
                   <ShopifyProducts integration={{ ...selectedIntegration, status: 'successful' }} />
