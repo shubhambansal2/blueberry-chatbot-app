@@ -2,6 +2,7 @@ import clsx from "clsx";
 
 import Link from "next/link";
 import React from "react";
+import { ShopLink } from './ShopLink';
 
 const LogoWithText = ({
   textClassName,
@@ -13,9 +14,9 @@ const LogoWithText = ({
   return (
     <div className="flex flex-row justify-between items-center space-x-1">
       {/* <LogoMain className={clsx(logoClassName)} /> */}
-      <Link href="/" className={clsx("font-bold text-2xl", textClassName)}>
+      <ShopLink href="/" className={clsx("font-bold text-2xl", textClassName)}>
         Foxtrot
-      </Link>
+      </ShopLink>
     </div>
   );
 };

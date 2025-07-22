@@ -6,6 +6,7 @@ import Logo from "../../../components/Logo";
 import { login } from "../../../lib/login";
 import GoogleLoginComponent from "../../../components/google_login";
 import GlobalLoadingOverlay from "../../../components/GlobalLoadingOverlay";
+import { useShop } from '../../../components/ShopContext';
 
 
 import type { NextPage } from "next";
@@ -20,6 +21,7 @@ import { useRouter } from "next/navigation";
 
 const SignIn: NextPage = () => {
   const router = useRouter();
+  const shop = useShop();
   const [error, setError] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -33,7 +35,9 @@ const SignIn: NextPage = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        router.push('/');
+        // Prefer shop from context, fallback to sessionStorage
+        const shopParam = shop || (typeof window !== 'undefined' ? sessionStorage.getItem('shop') : null);
+        router.push(`/${shopParam ? `?shop=${shopParam}` : ''}`);
       } else {
         setError('Invalid email or password');
         setIsLoading(false);

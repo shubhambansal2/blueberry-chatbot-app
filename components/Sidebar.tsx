@@ -33,6 +33,7 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
+import { ShopLink } from './ShopLink';
 
 // Move the user email logic to a separate component
 const UserEmailDisplay = () => {
@@ -416,7 +417,7 @@ export const SidebarLink = ({
   const isActive = pathname === link.href;
 
   return (
-    <Link
+    <ShopLink
       href={link.href}
       className={cn(
         "group/sidebar flex items-center justify-start gap-2 rounded-sm px-2 py-2 transition-colors duration-200",
@@ -456,7 +457,7 @@ export const SidebarLink = ({
           {link.label}
         </span>
       </motion.div>
-    </Link>
+    </ShopLink>
   );
 };
 

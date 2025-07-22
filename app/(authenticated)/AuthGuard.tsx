@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { validateToken } from '../../lib/auth';
 import GlobalLoadingOverlay from '../../components/GlobalLoadingOverlay';
 
@@ -11,13 +11,20 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const checkAuth = useCallback(async (showLoading = false) => {
     const token = localStorage.getItem('accessToken');
-    
+    // Extract all query parameters, including 'shop'
+    const params = new URLSearchParams(window.location.search);
+    const shop = params.get('shop');
+    // Always ensure 'shop' is present if available
+    if (shop) params.set('shop', shop);
+    // Build redirect URL with all params
+    const redirectUrl = `/login?redirect=${encodeURIComponent(pathname)}${params.toString() ? `&${params.toString()}` : ''}`;
     if (!token) {
       setIsAuthenticated(false);
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      router.push(redirectUrl);
       return;
     }
 
@@ -25,14 +32,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       const isValid = await validateToken(token);
       if (!isValid) {
         setIsAuthenticated(false);
-        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+        router.push(redirectUrl);
       } else {
         setIsAuthenticated(true);
       }
     } catch (error) {
       console.error('Token validation error:', error);
       setIsAuthenticated(false);
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      router.push(redirectUrl);
     } finally {
       if (showLoading) {
         setIsInitializing(false);

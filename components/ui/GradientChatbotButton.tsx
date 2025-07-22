@@ -2,9 +2,11 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useShop } from '../ShopContext';
 
 const GradientButton = () => {
   const router = useRouter();
+  const shop = useShop();
   const primaryColor = '#9e85b3';
   const darkerShade = '#846b98';  // Darker version
   const lighterShade = '#b8a3cc';  // Lighter version
@@ -15,7 +17,7 @@ const GradientButton = () => {
         className="relative group w-64 h-80 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl overflow-hidden"
         onClick={() => {
           console.log('Button clicked!');
-          router.push('/createchatbot');
+          router.push(`/createchatbot${shop ? `?shop=${shop}` : ''}`);
         }}
         style={{
           background: `linear-gradient(135deg, ${darkerShade} 0%, ${primaryColor} 50%, ${lighterShade} 100%)`

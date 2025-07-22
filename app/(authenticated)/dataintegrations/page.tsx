@@ -43,9 +43,103 @@ export default function DataIntegrations() {
   const [integrationToDelete, setIntegrationToDelete] = useState<Integration | null>(null)
   const hasProcessedRedirect = useRef(false)
 
+  // Track if shop param exists in URL
+  const [shopParamInUrl, setShopParamInUrl] = useState(false)
+
   useEffect(() => {
     checkExistingIntegrations()
   }, [])
+
+  // Handle shop URL parameter
+  useEffect(() => {
+    const handleShopUrlParam = async () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const shopParam = urlParams.get('shop')
+      
+      setShopParamInUrl(!!shopParam) // <-- Add this line to track if shop param exists
+      
+      if (shopParam) {
+        console.log('🔗 Shop parameter detected:', shopParam)
+        
+        const user = localStorage.getItem('user')
+        if (!user) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Please log in to connect your store",
+          })
+          return
+        }
+
+        // Check if integration already exists
+        const existingIntegrations = integrations.filter(integration => integration.shop === shopParam)
+        if (existingIntegrations.length > 0) {
+          console.log('⚠️ Integration already exists for shop:', shopParam)
+          toast({
+            title: "Info",
+            description: "Shopify store is already connected!",
+          })
+          // Do not remove the shop parameter from the URL
+          return
+        }
+
+        try {
+          setLoading(true)
+          console.log('✅ Creating integration for shop:', shopParam)
+          
+          const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/store_dataintegrations/${user}/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopParam })
+          })
+
+          if (!response.ok) throw new Error('Failed to store integration')
+
+          console.log('✅ Integration created successfully')
+
+          // Add the new integration to the local state immediately
+          // const newIntegration: Integration = {
+          //   id: Date.now().toString(), // Temporary ID
+          //   shop: shopParam,
+          //   platform: 'Shopify',
+          //   created_at: new Date().toISOString()
+          // }
+          // 
+          // setIntegrations(prev => [...prev, newIntegration])
+          // setSelectedIntegration(newIntegration)
+          
+          // Also refresh from server to get the real ID
+          await checkExistingIntegrations()
+          // Optionally, setSelectedIntegration to the new integration if you can identify it from the refreshed list
+          const updatedIntegrations = integrations.filter(integration => integration.shop === shopParam)
+          if (updatedIntegrations.length > 0) {
+            setSelectedIntegration(updatedIntegrations[updatedIntegrations.length - 1])
+          }
+          
+          toast({
+            title: "Success",
+            description: "Shopify store connected successfully!",
+          })
+
+          // Do not remove the shop parameter from the URL
+
+        } catch (error) {
+          console.error('❌ Error storing integration:', error)
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to complete Shopify integration. Please try again.",
+          })
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+
+    handleShopUrlParam()
+  }, [integrations]) // Depend on integrations to ensure we have the latest data
 
   // Cleanup processing flag on component unmount
   useEffect(() => {
@@ -65,23 +159,33 @@ export default function DataIntegrations() {
       const response = await fetch(`https://mighty-dusk-63104-f38317483204.herokuapp.com/api/users/get_dataintegrations/${user}/`)
       const data = await response.json()
 
+      // Log the raw integrations from backend
+      console.log('Fetched integrations:', data.dataintegrations)
+
       if (response.ok && data.dataintegrations?.length > 0) {
         // Transform the data to include platform information
         const transformedIntegrations = data.dataintegrations.map((integration: any) => ({
           id: integration.id || Math.random().toString(),
           shop: integration.shop,
-          platform: 'Shopify', // For now, assuming all integrations are Shopify
-          // status: integration.status === 'successful' ? 'successful' : 
-          //         integration.status === 'pending' ? 'pending' : 
-          //         integration.status === 'error' ? 'error' : 'none',
+          platform: 'Shopify',
           created_at: integration.created_at || new Date().toISOString()
         }))
-        
-        setIntegrations(transformedIntegrations)
-        
+
+        // Deduplicate by shop
+        const uniqueIntegrations: Integration[] = []
+        const seenShops = new Set()
+        for (const integration of transformedIntegrations) {
+          if (!seenShops.has(integration.shop)) {
+            uniqueIntegrations.push(integration)
+            seenShops.add(integration.shop)
+          }
+        }
+
+        setIntegrations(uniqueIntegrations)
+
         // Set the latest integration as selected if none is selected
-        if (!selectedIntegration && transformedIntegrations.length > 0) {
-          setSelectedIntegration(transformedIntegrations[transformedIntegrations.length - 1])
+        if (!selectedIntegration && uniqueIntegrations.length > 0) {
+          setSelectedIntegration(uniqueIntegrations[uniqueIntegrations.length - 1])
         }
       }
     } catch (error) {
@@ -381,7 +485,7 @@ export default function DataIntegrations() {
       )}
 
       {/* Add New Integration Card - Only show when there are existing integrations */}
-      {integrations.length > 0 && (
+      {integrations.length > 0 && !shopParamInUrl && (
         <Card>
           <CardHeader>
             <CardTitle>Add New Integration</CardTitle>

@@ -13,7 +13,7 @@ import ChatWidget from '../../../components/Chatbot_New2';
 import LoadingSkeletons from '../../../components/LoadingSkeletons';
 import ChatbotLoadingSkeleton from '../../../components/LoadingSkeletons';
 import TemplateCardShowcase from '../../../components/TemplateCardShowcase';
-
+import { useShop } from '../../../components/ShopContext';
 
 
 const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
@@ -93,10 +93,11 @@ const Testchatbotpage = () => {
   }, []);
 
   const router = useRouter();
+  const shop = useShop();
 
   const handleEditChatbot = (chatbot_id: number) => {
     console.log('Editing chatbot with ID:', chatbot_id);
-    router.push(`/editchatbot/${chatbot_id}`);
+    router.push(`/editchatbot/${chatbot_id}${shop ? `?shop=${shop}` : ''}`);
   };
   const handleDeleteChatbot = async (chatbot_id: number): Promise<void> => {
 
