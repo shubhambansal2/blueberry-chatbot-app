@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Loader2, X } from 'lucide-react';
 import ChatbotWindow from '../../../components/chatbot';
 import { fetchChatbots, Chatbot } from '../../../lib/chatbotsfetch';
@@ -179,7 +179,13 @@ const Testchatbotpage = () => {
   );
 };
 
-export default Testchatbotpage;
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Testchatbotpage />
+    </Suspense>
+  );
+}
 
  {/* <div className="flex flex-wrap -mx-4 mt-8">
             {savedChatbots.map((bot) => (

@@ -1,3 +1,5 @@
+'use client';
+
 import AuthenticatedLayout from './AuthenticatedLayout';
 
 export default function Layout({

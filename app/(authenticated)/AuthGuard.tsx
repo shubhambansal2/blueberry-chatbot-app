@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { validateToken } from '../../lib/auth';
 import GlobalLoadingOverlay from '../../components/GlobalLoadingOverlay';
 
@@ -11,7 +11,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const checkAuth = useCallback(async (showLoading = false) => {
     const token = localStorage.getItem('accessToken');

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useParams } from 'next/navigation'; // For accessing dynamic route parameters
 import { Menu, MessageCircle, User, X } from 'lucide-react';
 import axios from 'axios';
@@ -574,5 +574,11 @@ const ChatbotMessagesPage = () => {
   
 
   
-export default ChatbotMessagesPage;
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ChatbotMessagesPage />
+    </Suspense>
+  );
+}
 

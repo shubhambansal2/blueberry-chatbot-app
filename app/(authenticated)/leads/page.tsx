@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { Chatbot, fetchChatbots } from '../../../lib/chatbotsfetch';
@@ -16,7 +16,7 @@ interface Lead {
   phone: string;
 }
 
-export default function LeadsPage() {
+function LeadsPage() {
   // State
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -166,5 +166,13 @@ export default function LeadsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LeadsPage />
+    </Suspense>
   );
 }

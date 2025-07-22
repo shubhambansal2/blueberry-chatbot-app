@@ -1,7 +1,8 @@
 'use client'
 
+import React, { useState, useEffect, Suspense } from 'react';
 import { IconCheck, IconClock, IconTrash } from "@tabler/icons-react"
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import Image from 'next/image'
 import { Input } from "@components/ui/input"    
 import { Button } from "@components/ui/Button"
@@ -32,7 +33,7 @@ interface Integration {
   created_at: string
 }
 
-export default function DataIntegrations() {
+function DataIntegrations() {
   const { toast } = useToast()
   const [shopifyUrl, setShopifyUrl] = useState('')
   const [loading, setLoading] = useState(true)
@@ -674,5 +675,13 @@ export default function DataIntegrations() {
 
     </div>
   )
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DataIntegrations />
+    </Suspense>
+  );
 }
 
