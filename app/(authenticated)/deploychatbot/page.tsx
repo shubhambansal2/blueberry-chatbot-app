@@ -301,6 +301,18 @@ const PlatformIntegration = () => {
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
   const [isLoadingIntegration, setIsLoadingIntegration] = useState(false);
   const [shopName, setShopName] = useState('');
+  const [isShopifyAdmin, setIsShopifyAdmin] = useState(false);
+
+  // Check if user is in Shopify admin (shop parameter in URL)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shop = urlParams.get('shop');
+    if (shop) {
+      setIsShopifyAdmin(true);
+      setShopName(shop);
+      setSelectedPlatform('Shopify');
+    }
+  }, []);
 
    // Simulate fetching chatbots from backend
   const getChatbots = async () => {
@@ -415,180 +427,252 @@ const PlatformIntegration = () => {
 
   return (
     <div className='flex flex-col items-center justify-center'>
-    <Card className="w-full p-4 md:p-6">
-      <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Deploy Chatbot widget in your Website</h2>
-      <div className="flex flex-col md:flex-row">
-        {/* Sidebar - Platform Selection */}
-        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r pb-4 md:pb-0 md:pr-4 mb-4 md:mb-0">
-          {websitePlatforms.map((platform) => (
-            <button
-              key={platform.name}
-              onClick={() => setSelectedPlatform(platform.name)}
-              className={`w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg mb-2 flex items-center gap-2 transition-colors
-                ${selectedPlatform === platform.name 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'hover:bg-secondary/20'
-                }`}
-            >
-              <span>{platform.icon}</span>
-              {platform.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Chatbot Selection */}
-        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r px-2 md:px-4 pb-4 md:pb-0 mb-4 md:mb-0">
-          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Select Agent</h3>
-          {isLoading ? (
-            <div className="flex items-center justify-center h-24 md:h-32 text-muted-foreground">
-              Loading chatbots...
-            </div>
-          ) : (
+    <Card className={`w-full ${isShopifyAdmin ? 'max-w-2xl mx-auto p-6 mt-10' : 'p-4 md:p-6'}`}>
+      <h2 className={`font-semibold mb-6 text-center ${isShopifyAdmin ? 'text-2xl' : 'text-xl md:text-2xl'}`}>
+        {isShopifyAdmin ? 'Chatbot Configuration' : 'Deploy Chatbot widget in your Website'}
+      </h2>
+      {/* Shopify Admin Mode: Multiple Chatbots */}
+      {isShopifyAdmin && chatbots.length > 1 && (
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar for chatbot selection */}
+          <div className="md:w-56 w-full mb-4 md:mb-0">
+            <h3 className="text-base font-semibold mb-3 text-blue-800">Select Chatbot</h3>
             <div className="space-y-2">
               {chatbots.map((chatbot) => (
                 <button
                   key={chatbot.chatbot_id}
                   onClick={() => setSelectedChatbot(chatbot)}
-                  className={`w-full text-center font-semibold px-3 md:px-4 py-2 md:py-3 rounded-lg transition-colors border border-gray-200 text-sm md:text-base
+                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
                     ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
-                      ? 'bg-primary text-primary-foreground border-primary' 
-                      : 'hover:bg-secondary/20'
+                      ? 'bg-blue-600 text-white border-blue-600' 
+                      : 'hover:bg-blue-50'
                     }`}
                 >
                   {chatbot.chatbot_name}
                 </button>
               ))}
             </div>
-          )}
-        </div>
-        
-        {/* Content Area */}
-        <div className="w-full md:flex-1 px-2 md:pl-6">
-          {selectedPlatform ? (
-            <div>
-              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
-                {selectedPlatform === 'Need Help?' ? selectedPlatform : `Deploy to ${selectedPlatform}`}
-              </h3>
-              {selectedPlatform !== 'Need Help?' && (
-                <p className="text-muted-foreground mb-3 md:mb-4 text-sm md:text-base">
-                  Follow the steps below to deploy your chatbot
-                </p>
-              )}
-              
-              {/* Shopify Platform - Special handling */}
-              {selectedPlatform === 'Shopify' ? (
-                <div>
-                  {isLoadingIntegration ? (
-                    // Loading state for integration
-                    <div className="mb-4 md:mb-6">
-                      <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Quick Deploy</h4>
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
-                          <span className="ml-2 text-sm text-gray-600">Checking for connected stores...</span>
-                        </div>
-                      </div>
+          </div>
+          {/* Main configuration area */}
+          <div className="flex-1">
+            {selectedChatbot && (
+              <>
+                <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-blue-700 mb-1">Chatbot ID</label>
+                      <input 
+                        type="text" 
+                        value={selectedChatbot.chatbot_id} 
+                        readOnly 
+                        className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-mono"
+                      />
                     </div>
-                  ) : selectedIntegration ? (
-                    // Quick deploy option for connected stores
-                    <div className="mb-4 md:mb-6">
-                      <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Quick Deploy</h4>
-                      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-emerald-800 mb-1">
-                              Connected Store: {selectedIntegration.shop}
-                            </p>
-                            <p className="text-xs text-emerald-600">
-                              Click below to open your Shopify theme editor and add the widget
-                            </p>
-                          </div>
+                    <div>
+                      <label className="block text-sm font-medium text-blue-700 mb-1">API Key</label>
+                      <input 
+                        type="text" 
+                        value={selectedChatbot.api_key} 
+                        readOnly 
+                        className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-blue-700 mb-1">Chatbot Name</label>
+                      <input 
+                        type="text" 
+                        value={selectedChatbot.chatbot_name} 
+                        readOnly 
+                        className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => {
+                      if (shopName) {
+                        const shopName1 = shopName.split('.')[0];
+                        window.open(`https://admin.shopify.com/store/${shopName1}/themes/current/editor?context=apps`, '_blank');
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-base font-semibold flex items-center gap-2 transition-colors shadow-md"
+                  >
+                    <ExternalLink className="h-5 w-5" />
+                    Open Shopify Theme Editor
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Shopify Admin Mode: Single Chatbot */}
+      {isShopifyAdmin && chatbots.length === 1 && selectedChatbot && (
+        <>
+          <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">Chatbot ID</label>
+                <input 
+                  type="text" 
+                  value={selectedChatbot.chatbot_id} 
+                  readOnly 
+                  className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">API Key</label>
+                <input 
+                  type="text" 
+                  value={selectedChatbot.api_key} 
+                  readOnly 
+                  className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-1">Chatbot Name</label>
+                <input 
+                  type="text" 
+                  value={selectedChatbot.chatbot_name} 
+                  readOnly 
+                  className="w-full px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-mono"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              onClick={() => {
+                if (shopName) {
+                  const shopName1 = shopName.split('.')[0];
+                  window.open(`https://admin.shopify.com/store/${shopName1}/themes/current/editor?context=apps`, '_blank');
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-base font-semibold flex items-center gap-2 transition-colors shadow-md"
+            >
+              <ExternalLink className="h-5 w-5" />
+              Open Shopify Theme Editor
+            </button>
+          </div>
+        </>
+      )}
+      {/* Non-Shopify Admin Mode: Show all platforms, chatbot selection, and integration code/link */}
+      {!isShopifyAdmin && (
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar for platform selection */}
+          <div className="md:w-56 w-full mb-4 md:mb-0">
+            <h3 className="text-base font-semibold mb-3 text-blue-800">Select Platform</h3>
+            <div className="space-y-2">
+              {websitePlatforms.map((platform) => (
+                <button
+                  key={platform.name}
+                  onClick={() => setSelectedPlatform(platform.name)}
+                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
+                    ${selectedPlatform === platform.name 
+                      ? 'bg-primary text-primary-foreground border-primary' 
+                      : 'hover:bg-secondary/20'
+                    }`}
+                >
+                  <span className="mr-2">{platform.icon}</span>
+                  {platform.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Sidebar for chatbot selection */}
+          <div className="md:w-56 w-full mb-4 md:mb-0">
+            <h3 className="text-base font-semibold mb-3 text-blue-800">Select Chatbot</h3>
+            <div className="space-y-2">
+              {chatbots.map((chatbot) => (
+                <button
+                  key={chatbot.chatbot_id}
+                  onClick={() => setSelectedChatbot(chatbot)}
+                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
+                    ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
+                      ? 'bg-blue-600 text-white border-blue-600' 
+                      : 'hover:bg-blue-50'
+                    }`}
+                >
+                  {chatbot.chatbot_name}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Main content area */}
+          <div className="flex-1">
+            {selectedPlatform && (
+              <div>
+                <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
+                  {selectedPlatform === 'Need Help?' ? selectedPlatform : `Deploy to ${selectedPlatform}`}
+                </h3>
+                {selectedPlatform !== 'Need Help?' && (
+                  <p className="text-muted-foreground mb-3 md:mb-4 text-sm md:text-base">
+                    {websitePlatforms.find(p => p.name === selectedPlatform)?.instructions.map((instruction, index) => (
+                      <span key={index} className="block mb-1">{instruction}</span>
+                    ))}
+                  </p>
+                )}
+                {/* Shopify: Show App Embed link, not code */}
+                {selectedPlatform === 'Shopify' ? (
+                  <div className="mb-4 md:mb-6">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex flex-col gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-blue-800 mb-1">
+                            Enter your Shopify store name
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            For example: neo-balance-shoes.myshopify.com
+                          </p>
+                          <input 
+                            type="text"
+                            placeholder="your-store-name"
+                            className="mt-2 w-full px-3 py-2 border border-blue-200 rounded-lg text-sm"
+                            onChange={(e) => setShopName(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex justify-end">
                           <button
-                            onClick={handleShopifyDeploy}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+                            onClick={() => {
+                              if (shopName) {
+                                const shopName1 = shopName.split('.')[0];
+                                window.open(`https://admin.shopify.com/store/${shopName1}/themes/current/editor?context=apps`, '_blank');
+                              }
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
                           >
                             <ExternalLink className="h-4 w-4" />
-                            Deploy to Shopify
+                            Continue to App Embed
                           </button>
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    // App embed option for non-connected stores
-                    <div className="mb-4 md:mb-6">
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex flex-col gap-4">
-                          <div>
-                            <p className="text-sm font-medium text-blue-800 mb-1">
-                              Enter your Shopify store name
-                            </p>
-                            <p className="text-xs text-blue-600">
-                              For example: neo-balance-shoes.myshopify.com
-                            </p>
-                            <input 
-                              type="text"
-                              placeholder="your-store-name"
-                              className="mt-2 w-full px-3 py-2 border border-blue-200 rounded-lg text-sm"
-                              onChange={(e) => setShopName(e.target.value)}
-                            />
-                          </div>
-                          <div className="flex justify-end">
-                            <button
-                              onClick={() => {
-                                if (shopName) {
-                                  const shopName1 = shopName.split('.')[0];
-                                  window.location.href = `https://admin.shopify.com/store/${shopName1}/themes/current/editor?context=apps`;
-                                }
-                              }}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              Continue to App Embed
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                // Other platforms - show instructions and code
-                <>
-                  {/* Platform-specific instructions */}
-                  <div className="mb-4 md:mb-6">
-                    {websitePlatforms.find(p => p.name === selectedPlatform)?.instructions.map((instruction, index) => (
-                      <p key={index} className="mb-2 text-sm md:text-base">
-                        {instruction}
-                      </p>
-                    ))}
                   </div>
-
-                  {/* Code block */}
-                  {selectedPlatform !== 'Need Help?' && (
-                    <div className="mb-4 md:mb-6">
-                      <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Integration Code</h4>
-                      <CodeBlock code={getWidgetCode()} />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-32 md:h-full text-muted-foreground text-sm md:text-base">
-              Select a platform to get started
-            </div>
-          )}
+                ) : (
+                  // Other platforms: Show integration code
+                  <div className="mb-4 md:mb-6">
+                    <h4 className="text-base md:text-lg font-semibold mb-2 md:mb-3">Integration Code</h4>
+                    <CodeBlock code={getWidgetCode()} />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+      {/* WhatsApp/Instagram section for non-Shopify admin */}
+      {!isShopifyAdmin && (
+        <Card className='mt-6 md:mt-10 w-full p-4 md:p-6'>
+          <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Deploy your Chatbots to Whatsapp and Instagram Business</h2>
+          <button className='bg-primary text-primary-foreground px-3 md:px-4 py-2 rounded-lg text-sm md:text-base'>
+            Coming Soon
+          </button>
+        </Card>
+      )}
     </Card>
-    <Card className='mt-6 md:mt-10 w-full p-4 md:p-6'>
-      <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Deploy your Chatbots to Whatsapp and Instagram Business</h2>
-      <button className='bg-primary text-primary-foreground px-3 md:px-4 py-2 rounded-lg text-sm md:text-base'>
-        Coming Soon
-      </button>
-    </Card>
-    </div>
-  );
+  </div>
+);
 };
 
 export default function Page() {
