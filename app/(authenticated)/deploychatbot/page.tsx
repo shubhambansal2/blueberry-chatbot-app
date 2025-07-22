@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Card } from '../../../components/ui/Card';
 import { fetchChatbots, Chatbot } from '../../../lib/chatbotsfetch';
 import { 
@@ -591,4 +591,10 @@ const PlatformIntegration = () => {
   );
 };
 
-export default PlatformIntegration;
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PlatformIntegration />
+    </Suspense>
+  );
+}

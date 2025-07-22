@@ -17,7 +17,7 @@ import {
   AiOutlineTwitter,
 } from "react-icons/ai";
 import { useState, FormEvent, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const SignIn: NextPage = () => {
   const router = useRouter();

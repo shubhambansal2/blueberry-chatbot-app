@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog"
+import { useShop } from './ShopContext';
 
 type LeaveDialogProps = {
   onReset: () => void;
@@ -21,11 +22,12 @@ type LeaveDialogProps = {
 const LeaveDialog = ({ onReset }: LeaveDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const shop = useShop();
 
   const handleLeave = () => {
     onReset(); // Reset the form
     setIsOpen(false);
-    router.push('/testchatbot');
+    router.push(`/testchatbot${shop ? `?shop=${shop}` : ''}`);
   };
 
   return (

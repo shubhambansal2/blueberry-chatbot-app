@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { FloatingDock } from "../../../components/ui/Floating_dock";
 import { BackgroundGradient } from '../../../components/ui/background_gradient';
 import Link from 'next/link';
@@ -162,4 +162,10 @@ const CreateChatbotPage = () => {
 };
 
 
-export default CreateChatbotPage;
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateChatbotPage />
+    </Suspense>
+  );
+}

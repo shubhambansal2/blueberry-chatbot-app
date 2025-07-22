@@ -1,12 +1,21 @@
 // app/(authenticated)/page.tsx
 'use client'
 
+import React, { Suspense } from 'react';
 import Testchatbotpage from './testchatbot/page';
 import { StrictMode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import Templates from '../../components/TemplateCardShowcase';
 
-export default function Home() {
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Home />
+    </Suspense>
+  );
+}
+
+function Home() {
   return (
     <StrictMode>
   <div className="flex flex-col gap-10">

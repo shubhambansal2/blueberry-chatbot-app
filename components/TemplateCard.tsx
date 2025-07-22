@@ -3,6 +3,7 @@ import { GraduationCap, Building2, Search, Coffee, Hospital, PlaneIcon, HeartIco
 import { useRouter } from 'next/navigation';
 import { useChatbotStore } from 'store/useChatbotStore';
 import { coffeeTeaSpicesTemplate, tshirtStoreTemplate, organicProductsTemplate } from 'store/templates';
+import { useShop } from './ShopContext';
 
 
 interface TemplateProps {
@@ -21,11 +22,12 @@ const TemplateCard = ({
   icon = 'coffee' // default icon
 }: TemplateProps) => {
   const router = useRouter();
+  const shop = useShop();
 
   const handleTemplateSelect = (template_id: string) => {
     console.log(`Selected template: ${template_id}`);
     useChatbotStore.setState(template_id === 'hsf-001' ? tshirtStoreTemplate : template_id === 'cs-001' ? coffeeTeaSpicesTemplate : template_id === 'rec-001' ? organicProductsTemplate : organicProductsTemplate);
-    router.push(`/createchatbot`);
+    router.push(`/createchatbot${shop ? `?shop=${shop}` : ''}`);
   };
 
   const getIcon = () => {
