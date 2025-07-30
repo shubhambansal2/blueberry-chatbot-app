@@ -22,6 +22,7 @@ export const DataSourcesForm = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const dataSources = editChatbotStore(state => state.dataSources);
   const updateDataSources = editChatbotStore(state => state.updateDataSources);
+  const agentType = editChatbotStore(state => state.agentType);
 
   const { register, control, formState: { errors }, watch } = useForm<DataSourcesInputs>({
     defaultValues: {
@@ -274,91 +275,93 @@ export const DataSourcesForm = () => {
       </div>
 
       {/* Data Integrations Section */}
-      <div className="space-y-4 mb-10">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium">Data Integrations</label>
-          {isEditMode && (
-            <div className="flex items-center gap-2 text-sm text-amber-600">
-              <Lock className="w-4 h-4" />
-              <span>Integration locked</span>
+      {!agentType.isSupportAgent && (
+        <div className="space-y-4 mb-10">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium">Data Integrations</label>
+            {isEditMode && (
+              <div className="flex items-center gap-2 text-sm text-amber-600">
+                <Lock className="w-4 h-4" />
+                <span>Integration locked</span>
+              </div>
+            )}
+          </div>
+          
+          {loading ? (
+            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+              <div className="text-sm text-gray-600">Loading integrations...</div>
+            </div>
+          ) : integrations.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Integrations</CardTitle>
+                <CardDescription>
+                  {isEditMode 
+                    ? "Your chatbot's current data integration (cannot be changed)"
+                    : "Select a data source to use for your chatbot"
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {integrations.map((integration) => (
+                    <div
+                      key={integration.id}
+                      className={`p-4 border rounded-lg transition-colors ${
+                        selectedIntegration?.id === integration.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200'
+                      } ${
+                        !isEditMode ? 'cursor-pointer hover:border-gray-300' : 'cursor-not-allowed'
+                      }`}
+                      onClick={() => handleIntegrationSelect(integration)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <span className="text-green-600 font-semibold text-sm">S</span>
+                          </div>
+                          <div>
+                            <h3 className="font-medium">{integration.shop}</h3>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <span>{integration.platform}</span>
+                              <span>•</span>
+                              <span>Connected</span>
+                              {isEditMode && selectedIntegration?.id === integration.id && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-amber-600 font-medium">Current</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        {selectedIntegration?.id === integration.id && (
+                          <div className="flex items-center gap-2">
+                            {isEditMode && (
+                              <Lock className="w-4 h-4 text-amber-600" />
+                            )}
+                            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+              <div className="text-sm text-gray-600">
+                No integrations found. Connect your data sources to get started.
+              </div>
             </div>
           )}
-        </div>
-        
-        {loading ? (
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-            <div className="text-sm text-gray-600">Loading integrations...</div>
-          </div>
-        ) : integrations.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Integrations</CardTitle>
-              <CardDescription>
-                {isEditMode 
-                  ? "Your chatbot's current data integration (cannot be changed)"
-                  : "Select a data source to use for your chatbot"
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {integrations.map((integration) => (
-                  <div
-                    key={integration.id}
-                    className={`p-4 border rounded-lg transition-colors ${
-                      selectedIntegration?.id === integration.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200'
-                    } ${
-                      !isEditMode ? 'cursor-pointer hover:border-gray-300' : 'cursor-not-allowed'
-                    }`}
-                    onClick={() => handleIntegrationSelect(integration)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                          <span className="text-green-600 font-semibold text-sm">S</span>
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{integration.shop}</h3>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <span>{integration.platform}</span>
-                            <span>•</span>
-                            <span>Connected</span>
-                            {isEditMode && selectedIntegration?.id === integration.id && (
-                              <>
-                                <span>•</span>
-                                <span className="text-amber-600 font-medium">Current</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {selectedIntegration?.id === integration.id && (
-                        <div className="flex items-center gap-2">
-                          {isEditMode && (
-                            <Lock className="w-4 h-4 text-amber-600" />
-                          )}
-                          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-            <div className="text-sm text-gray-600">
-              No integrations found. Connect your data sources to get started.
-            </div>
-          </div>
-        )}
 
-      </div>
+        </div>
+      )}
     </div>
   );
 };

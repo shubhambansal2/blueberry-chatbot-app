@@ -14,8 +14,10 @@ import {
   Check,
   Copy,
   LifeBuoy,
-  ExternalLink
+  ExternalLink,
+  Lock
 } from 'lucide-react';
+import SubscriptionLock from '../../../components/SubscriptionLock';
 
 const websitePlatforms = [
   { 
@@ -439,17 +441,25 @@ const PlatformIntegration = () => {
             <h3 className="text-base font-semibold mb-3 text-blue-800">Select Chatbot</h3>
             <div className="space-y-2">
               {chatbots.map((chatbot) => (
-                <button
+                <SubscriptionLock 
                   key={chatbot.chatbot_id}
-                  onClick={() => setSelectedChatbot(chatbot)}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
-                    ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
-                      ? 'bg-blue-600 text-white border-blue-600' 
-                      : 'hover:bg-blue-50'
-                    }`}
+                  chatbot={chatbot}
+                  variant="compact"
+                  onLockedAction={() => {
+                    console.log('Chatbot is locked due to subscription requirement');
+                  }}
                 >
-                  {chatbot.chatbot_name}
-                </button>
+                  <button
+                    onClick={() => setSelectedChatbot(chatbot)}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
+                      ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
+                        ? 'bg-blue-600 text-white border-blue-600' 
+                        : 'hover:bg-blue-50'
+                      }`}
+                  >
+                    {chatbot.chatbot_name}
+                  </button>
+                </SubscriptionLock>
               ))}
             </div>
           </div>
@@ -585,17 +595,25 @@ const PlatformIntegration = () => {
             <h3 className="text-base font-semibold mb-3 text-blue-800">Select Chatbot</h3>
             <div className="space-y-2">
               {chatbots.map((chatbot) => (
-                <button
+                <SubscriptionLock 
                   key={chatbot.chatbot_id}
-                  onClick={() => setSelectedChatbot(chatbot)}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
-                    ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
-                      ? 'bg-blue-600 text-white border-blue-600' 
-                      : 'hover:bg-blue-50'
-                    }`}
+                  chatbot={chatbot}
+                  variant="compact"
+                  onLockedAction={() => {
+                    console.log('Chatbot is locked due to subscription requirement');
+                  }}
                 >
-                  {chatbot.chatbot_name}
-                </button>
+                  <button
+                    onClick={() => setSelectedChatbot(chatbot)}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition-colors border border-gray-200 text-sm font-medium
+                      ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
+                        ? 'bg-blue-600 text-white border-blue-600' 
+                        : 'hover:bg-blue-50'
+                      }`}
+                  >
+                    {chatbot.chatbot_name}
+                  </button>
+                </SubscriptionLock>
               ))}
             </div>
           </div>

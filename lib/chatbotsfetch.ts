@@ -7,6 +7,7 @@ export interface Chatbot {
   role: string;
   personality: string;
   api_key: string;
+  is_product_recommender?: boolean;
 }
 
 export const fetchChatbots = async (): Promise<Chatbot[]> => {
@@ -22,5 +23,24 @@ export const fetchChatbots = async (): Promise<Chatbot[]> => {
   } catch (error) {
     console.error('Error fetching chatbots:', error);
     return [];
+  }
+};
+
+// Function to check if user has active Sales and FAQ Chatbot subscription
+export const checkSalesAndFaqSubscription = async (shop: string): Promise<boolean> => {
+  try {
+    const { checkSubscriptionAndFeatures, getShopAccessToken } = await import('./shopifySubscription');
+    const accessToken = await getShopAccessToken(shop);
+    
+    if (!accessToken) {
+      console.log('No access token available for shop:', shop);
+      return false;
+    }
+
+    const features = await checkSubscriptionAndFeatures(shop, accessToken);
+    return features.hasSalesAndFaqAccess;
+  } catch (error) {
+    console.error('Error checking Sales and FAQ subscription:', error);
+    return false;
   }
 };
