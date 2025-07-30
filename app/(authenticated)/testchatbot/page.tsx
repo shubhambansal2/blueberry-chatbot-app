@@ -14,7 +14,7 @@ import LoadingSkeletons from '../../../components/LoadingSkeletons';
 import ChatbotLoadingSkeleton from '../../../components/LoadingSkeletons';
 import TemplateCardShowcase from '../../../components/TemplateCardShowcase';
 import { useShop } from '../../../components/ShopContext';
-
+import SubscriptionLock from '../../../components/SubscriptionLock';
 
 const ChatOverlay = ({ selectedChatbot, onClose }: { selectedChatbot: Chatbot | null, onClose: () => void }) => {
   if (!selectedChatbot) return null;
@@ -133,6 +133,12 @@ const Testchatbotpage = () => {
       console.log('Chatbot deleted');
   };
 
+  // Only apply subscription lock if shop parameter is present
+  const shouldApplySubscriptionLock = !!shop;
+  
+  console.log('Testchatbotpage: Shop parameter:', shop);
+  console.log('Testchatbotpage: Should apply subscription lock:', shouldApplySubscriptionLock);
+
   return (
       <div className="flex flex-col p-8 overflow-auto">
         
@@ -152,16 +158,33 @@ const Testchatbotpage = () => {
               savedChatbots.map((bot, index) => {
                 const colorSchemes = ['maroon', 'ocean', 'forest', 'plum', 'slate', 'sunset'];
                 const colorScheme = colorSchemes[index % colorSchemes.length];
+                
+                const chatbotCard = (
+                  <GradientCard
+                    chatbotName={bot.chatbot_name}
+                    companyName={bot.company_name}
+                    colorScheme={colorScheme as 'maroon' | 'ocean' | 'forest' | 'plum' | 'slate' | 'sunset'}
+                    Chatbottype={bot.is_product_recommender ? 'Data' : 'Customer Support FAQ'}
+                    onEdit={() => handleEditChatbot(bot.chatbot_id)}
+                    onDelete={() => handleDeleteChatbot(bot.chatbot_id)}
+                    onClick={() => handleChatbotClick(bot)}
+                  />
+                );
+
                 return (
                   <div key={bot.chatbot_id} className="flex-shrink-0">
-                    <GradientCard
-                      chatbotName={bot.chatbot_name}
-                      companyName={bot.company_name}
-                      colorScheme={colorScheme as 'maroon' | 'ocean' | 'forest' | 'plum' | 'slate' | 'sunset'}
-                      onEdit={() => handleEditChatbot(bot.chatbot_id)}
-                      onDelete={() => handleDeleteChatbot(bot.chatbot_id)}
-                      onClick={() => handleChatbotClick(bot)}
-                    />
+                    {shouldApplySubscriptionLock ? (
+                      <SubscriptionLock 
+                        chatbot={bot}
+                        onLockedAction={() => {
+                          console.log('Chatbot is locked due to subscription requirement');
+                        }}
+                      >
+                        {chatbotCard}
+                      </SubscriptionLock>
+                    ) : (
+                      chatbotCard
+                    )}
                   </div>
                 );
               })

@@ -22,6 +22,7 @@ export const DataSourcesForm = () => {
   // Get store data and update function separately
   const dataSources = useChatbotStore(state => state.dataSources);
   const updateDataSources = useChatbotStore(state => state.updateDataSources);
+  const agentType = useChatbotStore(state => state.agentType);
 
   const { register, control, formState: { errors }, watch } = useForm<DataSourcesInputs>({
     defaultValues: {
@@ -239,66 +240,68 @@ export const DataSourcesForm = () => {
       </div>
 
       {/* Data Integrations Section */}
-      <div className="space-y-4 mb-10">
-        <label className="block text-sm font-medium">Data Integrations</label>
-        
-        {loading ? (
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-            <div className="text-sm text-gray-600">Loading integrations...</div>
-          </div>
-        ) : integrations.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Integrations</CardTitle>
-              <CardDescription>
-                Select a data source to use for your chatbot
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {integrations.map((integration) => (
-                  <div
-                    key={integration.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedIntegration?.id === integration.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => handleIntegrationSelect(integration)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                          <span className="text-green-600 font-semibold text-sm">S</span>
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{integration.shop}</h3>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <span>{integration.platform}</span>
-                            <span>•</span>
-                            <span>Connected</span>
+      {!agentType.isSupportAgent && (
+        <div className="space-y-4 mb-10">
+          <label className="block text-sm font-medium">Data Integrations</label>
+          
+          {loading ? (
+            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+              <div className="text-sm text-gray-600">Loading integrations...</div>
+            </div>
+          ) : integrations.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Integrations</CardTitle>
+                <CardDescription>
+                  Select a data source to use for your chatbot
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {integrations.map((integration) => (
+                    <div
+                      key={integration.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                        selectedIntegration?.id === integration.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => handleIntegrationSelect(integration)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <span className="text-green-600 font-semibold text-sm">S</span>
+                          </div>
+                          <div>
+                            <h3 className="font-medium">{integration.shop}</h3>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <span>{integration.platform}</span>
+                              <span>•</span>
+                              <span>Connected</span>
+                            </div>
                           </div>
                         </div>
+                        {selectedIntegration?.id === integration.id && (
+                          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          </div>
+                        )}
                       </div>
-                      {selectedIntegration?.id === integration.id && (
-                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-white rounded-full"></div>
-                        </div>
-                      )}
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+              <div className="text-sm text-gray-600">
+                No integrations found. Connect your data sources to get started.
               </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-            <div className="text-sm text-gray-600">
-              No integrations found. Connect your data sources to get started.
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

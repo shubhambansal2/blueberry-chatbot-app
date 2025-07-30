@@ -2,13 +2,25 @@ import { useForm } from 'react-hook-form';
 import { useChatbotStore } from '../../store/useChatbotStore';
 import { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
-import { Bot, MessageSquare, Users, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Bot, MessageSquare, Users, CheckCircle, AlertCircle, Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { checkSubscriptionAndFeatures, getShopAccessToken } from '../../lib/shopifySubscription';
+import { useShop } from '../ShopContext';
 
 const ChatbotTypeForm = () => {
     const [dataIntegrations, setDataIntegrations] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [subscriptionFeatures, setSubscriptionFeatures] = useState<{
+        hasSalesAndFaqAccess: boolean;
+        hasFaqOnlyAccess: boolean;
+        subscriptionName?: string;
+        subscriptionStatus?: string;
+    }>({
+        hasSalesAndFaqAccess: false,
+        hasFaqOnlyAccess: false
+    });
     const { agentType, updateAgentType } = useChatbotStore();
+    const shopFromUrl = useShop();
     
     // Initialize selectedType based on store state
     const [selectedType, setSelectedType] = useState<string | null>(() => {
@@ -32,6 +44,27 @@ const ChatbotTypeForm = () => {
 
                 if (response.ok && data.dataintegrations?.length > 0) {
                     setDataIntegrations(data.dataintegrations);
+                    
+                    // Only check subscription for the shop from URL parameter
+                    if (shopFromUrl) {
+                        console.log('ChatbotTypeForm: Checking subscription for shop:', shopFromUrl);
+                        const accessToken = await getShopAccessToken(shopFromUrl);
+                        if (accessToken) {
+                            const features = await checkSubscriptionAndFeatures(
+                                shopFromUrl, 
+                                accessToken
+                            );
+                            setSubscriptionFeatures(features);
+                            console.log('ChatbotTypeForm: Subscription features:', features);
+                        }
+                    } else {
+                        console.log('ChatbotTypeForm: No shop parameter, skipping subscription check');
+                        // If no shop parameter, assume user has access (no restrictions)
+                        setSubscriptionFeatures({
+                            hasSalesAndFaqAccess: true,
+                            hasFaqOnlyAccess: true
+                        });
+                    }
                 } else {
                     setDataIntegrations(null);
                 }
@@ -44,7 +77,7 @@ const ChatbotTypeForm = () => {
         };
 
         checkExistingIntegrations();
-    }, []);
+    }, [shopFromUrl]);
 
     // Update store when selectedType changes
     useEffect(() => {
@@ -55,10 +88,12 @@ const ChatbotTypeForm = () => {
         }
     }, [selectedType, updateAgentType]);
 
-    // Remove the problematic sync effect - let user selection drive the state
-    // The store will be updated by the effect above when selectedType changes
-
     const handleTypeSelection = (type: string) => {
+        // Only allow selection if the feature is available
+        if (type === 'sales' && !subscriptionFeatures.hasSalesAndFaqAccess && shopFromUrl) {
+            console.log('ChatbotTypeForm: Sales agent selection blocked - no subscription');
+            return; // Don't allow selection of sales agent if not available and shop parameter is present
+        }
         setSelectedType(type);
     };
 
@@ -111,6 +146,18 @@ const ChatbotTypeForm = () => {
         );
     };
 
+    // Determine if sales agent option should be disabled
+    // Only disable if shop parameter is present AND user doesn't have subscription
+    const isSalesAgentDisabled = !dataIntegrations || (!!shopFromUrl && !subscriptionFeatures.hasSalesAndFaqAccess);
+    
+    // Use shop from URL parameter for upgrade link
+    const currentShop = shopFromUrl?.split('.')[0];
+
+    console.log('ChatbotTypeForm: Shop parameter:', shopFromUrl);
+    console.log('ChatbotTypeForm: Is sales agent disabled:', isSalesAgentDisabled);
+    console.log('ChatbotTypeForm: Has data integrations:', !!dataIntegrations);
+    console.log('ChatbotTypeForm: Has sales and FAQ access:', subscriptionFeatures.hasSalesAndFaqAccess);
+
     return (
         <div className="w-full max-w-6xl mx-auto p-8">
             {/* Header */}
@@ -141,7 +188,7 @@ const ChatbotTypeForm = () => {
                         
                         {/* Sales Agent Option */}
                         <div className={`group relative rounded-xl border-2 transition-all duration-200 ${
-                            !dataIntegrations ? 
+                            isSalesAgentDisabled ? 
                                 'border-gray-200 bg-gray-50 cursor-not-allowed' :
                                 selectedType === 'sales' ? 
                                     'border-blue-500 bg-blue-50 shadow-md' : 
@@ -150,25 +197,25 @@ const ChatbotTypeForm = () => {
                             <button
                                 className="w-full p-4 text-left disabled:cursor-not-allowed"
                                 onClick={() => handleTypeSelection('sales')}
-                                disabled={!dataIntegrations}
+                                disabled={isSalesAgentDisabled}
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3">
                                         <div className={`p-2 rounded-lg ${
-                                            !dataIntegrations ? 'bg-gray-200' : 'bg-blue-100'
+                                            isSalesAgentDisabled ? 'bg-gray-200' : 'bg-blue-100'
                                         }`}>
                                             <Users className={`w-5 h-5 ${
-                                                !dataIntegrations ? 'text-gray-400' : 'text-blue-600'
+                                                isSalesAgentDisabled ? 'text-gray-400' : 'text-blue-600'
                                             }`} />
                                         </div>
                                         <div>
                                             <h3 className={`font-semibold text-base ${
-                                                !dataIntegrations ? 'text-gray-400' : 'text-gray-900'
+                                                isSalesAgentDisabled ? 'text-gray-400' : 'text-gray-900'
                                             }`}>
                                                 Sales Agent + FAQ Support
                                             </h3>
                                             <p className={`text-sm mt-1 ${
-                                                !dataIntegrations ? 'text-gray-400' : 'text-gray-600'
+                                                isSalesAgentDisabled ? 'text-gray-400' : 'text-gray-600'
                                             }`}>
                                                 Advanced AI agent for sales and customer support
                                             </p>
@@ -193,6 +240,28 @@ const ChatbotTypeForm = () => {
                                             >
                                                 Configure now
                                             </Link>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {dataIntegrations && shopFromUrl && !subscriptionFeatures.hasSalesAndFaqAccess && (
+                                    <div className="flex items-center gap-2 mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                                        <Lock className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm text-amber-700">
+                                                This feature requires the Sales & FAQ Agent subscription.
+                                            </span>
+                                            {currentShop && (
+                                                <a 
+                                                    href={`https://admin.shopify.com/store/${currentShop}/charges/purpleberry-chatbot/pricing_plans`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-sm font-medium text-amber-700 hover:text-amber-800 underline"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    Upgrade now
+                                                </a>
+                                            )}
                                         </div>
                                     </div>
                                 )}

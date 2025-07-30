@@ -2,6 +2,7 @@
 
 import { SidebarLayout } from "../../components/Sidebar"; 
 import AuthGuard from "./AuthGuard";
+import ShopifySubscriptionChecker from "../../components/ShopifySubscriptionChecker";
 
 export default function AuthenticatedLayout({
   children,
@@ -11,6 +12,7 @@ export default function AuthenticatedLayout({
   return (
     
       <AuthGuard>
+        <ShopifySubscriptionChecker />
         <SidebarLayout>
       {children}
     </SidebarLayout>

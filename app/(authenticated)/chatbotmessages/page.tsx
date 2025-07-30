@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useRef, Suspense } from 'react';
-import { useParams } from 'next/navigation'; // For accessing dynamic route parameters
-import { Menu, MessageCircle, User, X } from 'lucide-react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import axios from 'axios';
 import { Chatbot, fetchChatbots } from '../../../lib/chatbotsfetch';
-import { Button } from "../../../components/ui/Button";
-import { Bot, Users } from 'lucide-react';
+import { Users, Menu, User, MessageCircle } from 'lucide-react';
+import SubscriptionLock from '../../../components/SubscriptionLock';
 import ChatSkeleton from '../../../components/Chatskeleton';
+import { Button } from '../../../components/ui/Button';
+import { IconMessage } from '@tabler/icons-react';
 
 // Custom MessageFormatter for chat messages (without background styling)
 const ChatMessageFormatter: React.FC<{ message: string }> = ({ message }) => {
@@ -249,7 +249,9 @@ interface Message {
           className="md:hidden text-gray-400 hover:text-white"
           onClick={() => setSidebarOpen(false)}
         >
-          <X className="h-5 w-5" />
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </Button>
       </div>
 
@@ -258,22 +260,35 @@ interface Message {
         {/* Chatbots Section */}
         <div>
           <div className="flex items-center gap-2 px-2 mb-2">
-            <Bot className="h-4 w-4 text-black" />
+         <IconMessage className="h-4 w-4 text-black" />
             <h3 className="text-sm font-medium text-black">Chatbots</h3>
           </div>
           <div className="space-y-1">
-            {isLoading ? <ChatbotListSkeleton /> : chatbots.map(chatbot => (
-              <button
-                key={chatbot.chatbot_id}
-                onClick={() => onSelectChatbot(chatbot)}
-                className={`w-full px-2 py-1.5 text-sm text-left rounded-md transition-colors 
-                  ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
-                    ? 'bg-primary font-medium text-gray-100' 
-                    : 'text-black font-medium hover:bg-gray-800 hover:text-white'}`}
-              >
-                {chatbot.chatbot_name}
-              </button>
-            ))}
+            {isLoading ? (
+              <div className="w-full px-2 py-1.5 text-sm text-left rounded-md bg-gray-300 animate-pulse" style={{ height: "40px" }} />
+            ) : (
+              chatbots.map(chatbot => (
+                <SubscriptionLock 
+                  key={chatbot.chatbot_id}
+                  chatbot={chatbot}
+                  variant="compact"
+                  onLockedAction={() => {
+                    console.log('Chatbot is locked due to subscription requirement');
+                  }}
+                >
+                  <button
+                    key={chatbot.chatbot_id}
+                    onClick={() => onSelectChatbot(chatbot)}
+                    className={`w-full px-2 py-1.5 text-sm text-left rounded-md transition-colors 
+                      ${selectedChatbot?.chatbot_id === chatbot.chatbot_id 
+                        ? 'bg-primary font-medium text-gray-100' 
+                        : 'text-black font-medium hover:bg-gray-800 hover:text-white'}`}
+                  >
+                    {chatbot.chatbot_name}
+                  </button>
+                </SubscriptionLock>
+              ))
+            )}
           </div>
         </div>
 
@@ -302,7 +317,7 @@ interface Message {
     </div>
   );
 };
-  
+
 const ChatbotMessagesPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   

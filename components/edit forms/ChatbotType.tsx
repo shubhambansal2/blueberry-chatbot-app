@@ -2,13 +2,25 @@ import { useForm } from 'react-hook-form';
 import { editChatbotStore } from '../../store/editChatbotStore';
 import { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
-import { Bot, MessageSquare, Users, CheckCircle, AlertCircle, Loader2, Lock } from 'lucide-react';
+import { Bot, MessageSquare, Users, CheckCircle, AlertCircle, Loader2, Lock, Info } from 'lucide-react';
 import Link from 'next/link';
+import { checkSubscriptionAndFeatures, getShopAccessToken } from '../../lib/shopifySubscription';
+import { useShop } from '../ShopContext';
 
 const ChatbotTypeForm = () => {
     const [dataIntegrations, setDataIntegrations] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [subscriptionFeatures, setSubscriptionFeatures] = useState<{
+        hasSalesAndFaqAccess: boolean;
+        hasFaqOnlyAccess: boolean;
+        subscriptionName?: string;
+        subscriptionStatus?: string;
+    }>({
+        hasSalesAndFaqAccess: false,
+        hasFaqOnlyAccess: false
+    });
     const { agentType, updateAgentType } = editChatbotStore();
+    const shopFromUrl = useShop();
     
     // Initialize selectedType based on store state
     const [selectedType, setSelectedType] = useState<string | null>(() => {
@@ -32,6 +44,18 @@ const ChatbotTypeForm = () => {
 
                 if (response.ok && data.dataintegrations?.length > 0) {
                     setDataIntegrations(data.dataintegrations);
+                    
+                    // Only check subscription for the shop from URL parameter
+                    if (shopFromUrl) {
+                        const accessToken = await getShopAccessToken(shopFromUrl);
+                        if (accessToken) {
+                            const features = await checkSubscriptionAndFeatures(
+                                shopFromUrl, 
+                                accessToken
+                            );
+                            setSubscriptionFeatures(features);
+                        }
+                    }
                 } else {
                     setDataIntegrations(null);
                 }
@@ -44,7 +68,7 @@ const ChatbotTypeForm = () => {
         };
 
         checkExistingIntegrations();
-    }, []);
+    }, [shopFromUrl]);
 
     // Update store when selectedType changes (only for create mode, not edit mode)
     useEffect(() => {
@@ -128,6 +152,16 @@ const ChatbotTypeForm = () => {
                         Agent type is locked and cannot be modified
                     </span>
                 </div>
+
+                {/* Subscription Status Info */}
+                {subscriptionFeatures.subscriptionName && (
+                    <div className="mt-4 flex items-center justify-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg max-w-md mx-auto">
+                        <Info className="w-4 h-4 text-blue-600" />
+                        <span className="text-blue-800 text-sm">
+                            Current subscription: {subscriptionFeatures.subscriptionName} ({subscriptionFeatures.subscriptionStatus})
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Loading State */}
