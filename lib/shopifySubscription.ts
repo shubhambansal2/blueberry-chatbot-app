@@ -210,7 +210,8 @@ export async function checkSubscriptionAndFeatures(shop: string, accessToken: st
       
       // Check for specific subscription types
       const salesAndFaqSubscription = subscriptions.find(sub => 
-        sub.name === 'Sales & FAQ Agent' && sub.status === 'ACTIVE'
+        (sub.name === 'Sales Agent Basic' && sub.status === 'ACTIVE')
+        || (sub.name === 'Sales Agent Pro' && sub.status === 'ACTIVE')
       );
       
       const faqOnlySubscription = subscriptions.find(sub => 
@@ -255,4 +256,4 @@ export async function checkSubscriptionAndFeatures(shop: string, accessToken: st
       hasFaqOnlyAccess: false
     };
   }
-} 
+}
