@@ -212,6 +212,7 @@ export async function checkSubscriptionAndFeatures(shop: string, accessToken: st
       const salesAndFaqSubscription = subscriptions.find(sub => 
         (sub.name === 'Sales Agent Basic' && sub.status === 'ACTIVE')
         || (sub.name === 'Sales Agent Pro' && sub.status === 'ACTIVE')
+        || (sub.name === 'formydemostore' && sub.status === 'ACTIVE')
       );
       
       const faqOnlySubscription = subscriptions.find(sub => 
